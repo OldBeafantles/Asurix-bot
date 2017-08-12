@@ -1,70 +1,134 @@
 import discord
+from discord.ext import commands
 import asyncio
-import requests
-from io import BytesIO
+from modules.utils import utils
+import os
+import logging
+import sys
+import importlib
 
-#CONFIGURATION
-c1ID = '291941571081928704'
-c2ID = '345548753366810625'
+# Useful functions
+clear = lambda: os.system("cls")
 
-with open("token.txt", "r") as f:
-    token = f.read()
+# Logger
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename = "discord.log", encoding = 'utf-8', mode = 'w')
+handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+logger.addHandler(handler)
 
-client = discord.Client()
 
-
-@client.event
-async def on_ready():
-    print("Logged in as " + client.user.name + "#" + client.user.discriminator)
-    print("Looking for the 2 channels...")
-
-    global c1
-    global c2
-    for s in client.servers:
-        c1 = discord.utils.find(lambda c: c.id == c1ID, s.channels)
-        if c1:
-            break
-    for s in client.servers:
-        c2 = discord.utils.find(lambda c: c.id == c2ID, s.channels)
-        if c2:
-            break
+class Bot(commands.Bot):
     
-    if c1:
-        print("Found first channel --> " + c1.name + " in " + c1.server.name)
-    else:
-        print("The first channel wasn't found... The ID provided must be incorrect.")
-    if c2:    
-        print("Found second channel --> " + c2.name + " in " + c2.server.name)
-    else:
-        print("The second channel wasn't found... The ID provided must be incorrect.")
 
-@client.event
-async def on_message(msg):
-    if (msg.channel.id == c1ID or msg.channel.id == c2ID) and msg.author.id != client.user.id:
-        if msg.channel.id == c1ID:
-            channelToSend = c2    
-        elif msg.channel.id == c2ID:
-            channelToSend = c1
+    def checkInfos(self):
         
+        # Première lancement du bot ou édition manuelle de l'utilisateur
+        if not os.path.exists("settings/infos.json"):
 
-        color = discord.Colour(sorted(msg.author.roles, key = lambda r: r.position, reverse=True)[0].colour.value)
+            jsonData = {}
+            token = input("Please put your bot's token here:\n> ")
+            print("DO NOT SPREAD YOUR BOT'S TOKEN TO ANYONE. NEVER.\n")
+            prefix = input("\n\nPlease put your bot's prefix here:\n> ")
+            description = input("\n\nPlease put a little description for your bot (optionnal)\n> ")
+            if description == "":
+                description = "A basic bot originally made for Asurix#4727"
+            ownerID = input("\n\nPlease put your ID:\n> ")
+            
+            jsonData["token"] = token
+            jsonData["prefix"] = prefix
+            jsonData["description"] = description
+            jsonData["ownerID"] = ownerID
+            self.token = token
+            self.prefix = prefix
+            self.description = description
+            self.ownerID = ownerID
+
+            if not os.path.isdir("settings"):
+                os.system("mkdir settings")
+
+            utils.save_json(jsonData, "settings/infos.json")
+
+        else:
+            jsonData = utils.load_json("settings/infos.json")
+            if not jsonData["token"] or not jsonData["prefix"] or not jsonData["description"] or not jsonData["ownerID"]:
+                print("\"settings/infos.json\" is incorrect! The bot will be reseted, please restart the bot!")
+                os.remove("settings/infos.json")
+                sys.exit(1)
+            else:
+                self.token = jsonData["token"]
+                self.prefix = jsonData["prefix"]
+                self.description = jsonData["description"]
+                self.ownerID = jsonData["ownerID"]
+
+
+    def run(self):
         
-        if not ((len(msg.embeds) != 0 and sum(len(i["url"]) for i in msg.embeds) + msg.content.count(" ") == len(msg.content)) or (len(msg.content) == 0 and len(msg.attachments) != 0)):
-            embedMsg = discord.Embed(description = msg.content, colour = color)
-            embedMsg.set_author(name = msg.author.name + "#" + msg.author.discriminator, icon_url = msg.author.avatar_url)
-            await client.send_message(channelToSend, embed = embedMsg)
+        logged = False
+        while not logged:
+            try:
+                super().run(self.token)
+                logged = True
+            except Exception as e:
+                print("Couldn't log in, your bot's token might be incorrect! If it's not, then check Discord's status here: https://status.discordapp.com/")
+                answer = input("Do you want to change your bot's token? (yes/no)\n> ")
+                if answer.upper() == "YES":
+                    token = input("\n\nPlease put your new bot's token here:\n> ")
+                    jsonData = utils.load_json("settings/infos.json")
+                    jsonData["token"] = token
+                    self.token = token
+                    utils.save_json(jsonData, "settings/infos.json")
 
-        if len(msg.embeds) != 0:
-            for e in msg.embeds:
-                await client.send_message(channelToSend, "`From " + msg.author.name + "#" + msg.author.discriminator + ":\n\n`" + e["url"])
+
+    def loadModules(self):
+
+        # Première lancement du bot ou édition manuelle de l'utilisateur
+        if not os.path.exists("settings/modules.json"):
+            jsonData = self.defaultModules
+            self.modules = self.defaultModules
+            utils.save_json(jsonData, "settings/modules.json")
+
+        self.modules = utils.load_json("settings/modules.json")
+        for m in self.modules:
+            modulePath = "modules/" + m + "/" + m + ".py"
+            if not os.path.exists(modulePath):
+                print("The cog \"" + m + "\" doesn't exist!")
+            else:
+                try:
+                    module = importlib.import_module(modulePath.replace('/', '.')[:-2])
+                    importlib.reload(module)
+                    super().load_extension(m)
+                    self.loadedModules.append(m)
+                except SyntaxError as e:
+                    print("Error in " + m + " module:\n\n" + str(e) + "\n\n")
                 
-        if len(msg.attachments) != 0:
-            for a in msg.attachments:
-                r = requests.get(a["url"])
-                if r.status_code == 200:
-                    await client.send_file(destination = channelToSend, fp = BytesIO(r.content), filename = a["filename"], content = "`From " + msg.author.name + "#" + msg.author.discriminator + "`:")
-
-        
 
 
-client.run(token)
+    def __init__(self):
+
+        clear()
+        self.checkInfos()
+        self.bot = discord.Client()
+        self.defaultModules = ["communications"]
+        self.loadedModules = []
+        super().__init__(command_prefix = self.prefix, description = self.description)
+
+        clear()
+        self.loadModules()
+
+
+
+
+bot = Bot()
+
+@bot.event
+async def on_ready():
+    print("Logged in as " + bot.user.name + "#" + bot.user.discriminator)
+    print(str(len(bot.servers))+ " servers")
+    print(str(len(set(bot.get_all_channels()))) + " channels")
+    print(str(len(set(bot.get_all_members()))) + " members")
+    print("\n" + str(len(bot.loadedModules)) + " modules loaded.")
+
+
+
+bot.run()

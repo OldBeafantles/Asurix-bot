@@ -1,2 +1,6 @@
 token.txt
 .vscode/*
+discord.log
+settings/*
+*.pyc
+modules/communications/communications.py

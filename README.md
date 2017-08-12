@@ -11,10 +11,10 @@
 ### General improvments
 
 * [ ] A safe system to handle rate limits
-* [ ] Use of json files to store data
-* [ ] Auto-checking of bot updates according to the github repo
+* [X] Use of json files to store data
+* [X] Auto-checking of bot updates according to the github repo
 * [ ] A guide for installing the bot
-* [ ] A script to install the bot's requirements easily
+* [X] A script to install the bot's requirements easily
 
 ### Communication between different channels from different servers
 

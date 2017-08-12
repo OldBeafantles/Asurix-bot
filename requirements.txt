@@ -1,0 +1,4 @@
+pip install simplejson
+pip install -U discord.py[voice]
+pip install asyncio
+pip install requests
