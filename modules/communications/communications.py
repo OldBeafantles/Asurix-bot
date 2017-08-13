@@ -44,6 +44,7 @@ class Communications:
 
                 embedsToSend = []
                 attachmentsToSend = []
+                embedMsg = None
 
                 if not ((len(msg.embeds) != 0 and sum(len(i["url"]) for i in msg.embeds) + msg.content.count(" ") == len(msg.content)) or (len(msg.content) == 0 and len(msg.attachments) != 0)):
                     embedMsg = discord.Embed(description = msg.content, colour = color)

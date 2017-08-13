@@ -4,7 +4,7 @@
 
 ## Features list
 
-* Communication between different channels from different servers
+* Inter-channels communication
 
 ## Improvments to do
 
@@ -16,13 +16,22 @@
 * [ ] A guide for installing the bot
 * [X] A script to install the bot's requirements easily
 
-### Communication between different channels from different servers
+### Inter-channels communication
 
 * [ ] Update edited / deleted messages
 * [ ] Unlimited number of channels
 * [ ] Unlimited number of communications
 * [ ] Notify the user if the bot doesn't have the permissions to send messages / attachments in at least one of the channel of its different registered communications
 * [ ] Group several messages in a row from a same user in an unique embed ![Example](http://i.imgur.com/84PjK2D.png)
+
+## Bugs
+
+* Inter-channels communication
+  * [X] Bug#1 - Cannot send messages with only attachments/embeds
+  * [ ] Bug#2 - Embed's color isn't always correct
+* General
+  * [X] Bug#3 - Infinite loop when the bot can't log in
+  * [ ] Bug#4 - Can't detect if the git repo is outdated
 
 ## Upcoming features
 

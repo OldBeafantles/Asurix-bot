@@ -64,11 +64,8 @@ class Bot(commands.Bot):
 
     def run(self):
         
-        logged = False
-        while not logged:
             try:
                 super().run(self.token)
-                logged = True
             except Exception as e:
                 print("Couldn't log in, your bot's token might be incorrect! If it's not, then check Discord's status here: https://status.discordapp.com/")
                 answer = input("Do you want to change your bot's token? (yes/no)\n> ")
@@ -78,6 +75,7 @@ class Bot(commands.Bot):
                     jsonData["token"] = token
                     self.token = token
                     utils.save_json(jsonData, "settings/infos.json")
+                    sys.exit(1)
 
 
     def loadModules(self):
