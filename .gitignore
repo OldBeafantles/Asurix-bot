@@ -3,4 +3,4 @@ token.txt
 discord.log
 settings/*
 *.pyc
-modules/communications/communications.py
+modules/communications/data/*

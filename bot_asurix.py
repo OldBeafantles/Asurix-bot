@@ -45,7 +45,7 @@ class Bot(commands.Bot):
             self.ownerID = ownerID
 
             if not os.path.isdir("settings"):
-                os.system("mkdir settings")
+                os.makedirs("settings")
 
             utils.save_json(jsonData, "settings/infos.json")
 
@@ -91,13 +91,14 @@ class Bot(commands.Bot):
         self.modules = utils.load_json("settings/modules.json")
         for m in self.modules:
             modulePath = "modules/" + m + "/" + m + ".py"
+            moduleName = modulePath.replace('/', '.')[:-3]
             if not os.path.exists(modulePath):
                 print("The cog \"" + m + "\" doesn't exist!")
             else:
                 try:
-                    module = importlib.import_module(modulePath.replace('/', '.')[:-2])
+                    module = importlib.import_module(modulePath.replace('/', '.')[:-3])
                     importlib.reload(module)
-                    super().load_extension(m)
+                    super().load_extension(moduleName)
                     self.loadedModules.append(m)
                 except SyntaxError as e:
                     print("Error in " + m + " module:\n\n" + str(e) + "\n\n")
