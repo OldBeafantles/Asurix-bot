@@ -31,7 +31,7 @@
   * [ ] Bug#2 - Embed's color isn't always correct
 * General
   * [X] Bug#3 - Infinite loop when the bot can't log in
-  * [ ] Bug#4 - Can't detect if the git repo is outdated
+  * [X] Bug#4 - Can't detect if the git repo is outdated
 
 ## Upcoming features
 

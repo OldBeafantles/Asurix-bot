@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 # USEFUL FUNCTIONS
 clear = lambda: os.system("cls")
@@ -22,7 +23,8 @@ def installUpdate():
 # LAUNCHING THE BOT
 clear()
 
-if os.system('git fetch') > 0:
+returnValue = subprocess.call('git fetch', shell = True)
+if returnValue != 0:
     answer = input("The bot isn't up-to-date, please type 'yes' to update it!\n\n> ")
     if answer.upper() == "YES":
         os.system('git pull')
