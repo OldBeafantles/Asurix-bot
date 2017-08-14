@@ -110,6 +110,7 @@ class Bot(commands.Bot):
         self.bot = discord.Client()
         self.defaultModules = ["communications"]
         self.loadedModules = []
+        self.inviteLink = ""
         super().__init__(command_prefix = self.prefix, description = self.description)
 
         clear()
@@ -127,6 +128,8 @@ async def on_ready():
     print(str(len(set(bot.get_all_channels()))) + " channels")
     print(str(len(set(bot.get_all_members()))) + " members")
     print("\n" + str(len(bot.loadedModules)) + " modules loaded.")
+    bot.inviteLink = "https://discordapp.com/oauth2/authorize?client_id=" + bot.user.id + "&scope=bot"
+
 
 
 
