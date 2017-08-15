@@ -30,7 +30,7 @@ clear()
 
 returnValue = subprocess.call('git fetch', shell = True)
 if returnValue != 0:
-    answer = input("The bot isn't up-to-date, please type 'yes' to update it!\n\n> ")
+    answer = str(input("The bot isn't up-to-date, please type 'yes' to update it!\n\n> "))
     if answer.upper() == "YES":
         os.system('git pull')
 
@@ -39,11 +39,11 @@ while answer != "4":
     
     clear()
 
-    answer = input( "What do you want to do?\n\n" + 
+    answer = str(input( "What do you want to do?\n\n" + 
                     "1. Install & update requirments\n" +
                     "2. Launch the bot with autorestart\n" +
                     "3. Launch the bot\n" +
-                    "4. Quit\n\n> ")
+                    "4. Quit\n\n> "))
 
     if answer == "1":
         installUpdate()
