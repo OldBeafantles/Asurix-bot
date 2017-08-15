@@ -65,24 +65,8 @@ class Bot(commands.Bot):
                 self.ownerID = jsonData["ownerID"]
 
 
-    def run(self):
-        
-            try:
-                super().run(self.token)
-            except Exception as e:
-                print("Couldn't log in, your bot's token might be incorrect! If it's not, then check Discord's status here: https://status.discordapp.com/")
-                answer = input("Do you want to change your bot's token? (yes/no)\n> ")
-                if answer.upper() == "YES":
-                    token = input("\n\nPlease put your new bot's token here:\n> ")
-                    jsonData = utils.load_json("settings/infos.json")
-                    jsonData["token"] = token
-                    self.token = token
-                    utils.save_json(jsonData, "settings/infos.json")
-                    sys.exit(1)
-
-
     def loadModules(self):
-
+    
         # Première lancement du bot ou édition manuelle de l'utilisateur
         if not os.path.exists("settings/modules.json"):
             jsonData = self.defaultModules
@@ -103,7 +87,23 @@ class Bot(commands.Bot):
                     self.loadedModules.append(m)
                 except SyntaxError as e:
                     print("Error in " + m + " module:\n\n" + str(e) + "\n\n")
-                
+
+
+    def run(self):
+ 
+            try:
+                super().run(self.token, reconnect = True)
+            except Exception as e:
+                print("Couldn't log in, your bot's token might be incorrect! If it's not, then check Discord's status here: https://status.discordapp.com/")
+                answer = input("Do you want to change your bot's token? (yes/no)\n> ")
+                if answer.upper() == "YES":
+                    token = input("\n\nPlease put your new bot's token here:\n> ")
+                    jsonData = utils.load_json("settings/infos.json")
+                    jsonData["token"] = token
+                    self.token = token
+                    utils.save_json(jsonData, "settings/infos.json")
+                    sys.exit(1)
+
 
 
     def __init__(self):
@@ -117,7 +117,6 @@ class Bot(commands.Bot):
         super().__init__(command_prefix = self.prefix, description = self.description)
 
         clear()
-        self.loadModules()
 
 
 
@@ -130,11 +129,9 @@ async def on_ready():
     print(str(len(bot.servers))+ " servers")
     print(str(len(set(bot.get_all_channels()))) + " channels")
     print(str(len(set(bot.get_all_members()))) + " members")
-    print("\n" + str(len(bot.loadedModules)) + " modules loaded.")
     bot.inviteLink = "https://discordapp.com/oauth2/authorize?client_id=" + bot.user.id + "&scope=bot"
-    print("\n\nHere's the invitation link for your bot: " + bot.inviteLink)
-
-
-
+    print("\nHere's the invitation link for your bot: " + bot.inviteLink)
+    bot.loadModules()
+    print("\n" + str(len(bot.loadedModules)) + " modules loaded.")
 
 bot.run()

@@ -11,6 +11,30 @@ from discord.ext import commands
 class Communications:
     """Inter-channels communications module"""
 
+
+    def parseCommunications(self):
+        
+        for conv in self.communications:
+            for c in conv:
+                
+                channel = discord.utils.find(lambda x: x.id == c, self.bot.get_all_channels())
+                
+                if channel:
+                    perms = channel.permissions_for(discord.utils.find(lambda m: m.id == self.bot.user.id, channel.server.members))
+                    
+                    if not perms.read_messages:
+                        print("Warning: Can't read messages in #" + channel.name + ", in server " + channel.server.name)
+
+                    if not perms.send_messages:
+                        print("Warning: Can't send messages in #" + channel.name + ", in server " + channel.server.name)
+
+                    if not perms.attach_files:
+                        print("Warning: Can't attach files in #" + channel.name + ", in server " + channel.server.name)
+
+                else:
+                    print("Warning : There's no channel with " + c + " as ID! Please ensure the bot is in the server!")
+
+
     def loadCommunicationsFile(self):
         
         if not os.path.exists("modules/communications/data/communications.json"):
@@ -22,6 +46,7 @@ class Communications:
             utils.save_json(jsonData, "modules/communications/data/communications.json")
         
         self.communications = utils.load_json("modules/communications/data/communications.json")
+        self.parseCommunications()
 
     def __init__(self, bot):
         
@@ -54,6 +79,7 @@ class Communications:
                 if channel == channelID:
                     return True
         return False
+
 
 
     async def checkCommunications(self, msg):
