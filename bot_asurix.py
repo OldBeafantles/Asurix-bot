@@ -8,7 +8,10 @@ import sys
 import importlib
 
 # Useful functions
-clear = lambda: os.system("cls")
+if sys.platform == "win32" or sys.platform == "win64":
+    clear = lambda: os.system("cls")
+else:
+    clear = lambda: os.system("clear")
 
 # Logger
 logger = logging.getLogger('discord')

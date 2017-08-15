@@ -1,8 +1,13 @@
 import os
 import subprocess
+import sys
+
 
 # USEFUL FUNCTIONS
-clear = lambda: os.system("cls")
+if sys.platform == "win32" or sys.platform == "win64":
+    clear = lambda: os.system("cls")
+else:
+    clear = lambda: os.system("clear")
 
 # Install & update the requirements for the bot according to the needed modules listed in requirements.txt
 def installUpdate():

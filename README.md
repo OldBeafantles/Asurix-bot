@@ -33,6 +33,7 @@
 * General
   * [X] Bug#3 - Infinite loop when the bot can't log in
   * [X] Bug#4 - Can't detect if the git repo is outdated
+  * [X] Bug#5 - Clear function doesn't work on non-Windows OS
 
 ## Upcoming features
 
