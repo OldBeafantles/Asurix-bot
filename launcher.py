@@ -30,11 +30,11 @@ def installUpdate():
 # LAUNCHING THE BOT
 clear()
 
-returnValue = subprocess.call('git fetch', shell = True)
-if returnValue != 0:
+text = subprocess.check_output("git status", shell = True)
+if "Your branch is behind" in str(text):
     answer = input("The bot isn't up-to-date, please type 'yes' to update it!\n\n> ")
     if answer.upper() == "YES":
-        os.system('git pull')
+        os.system("git pull")
 
 answer = ""
 while answer != "4":
