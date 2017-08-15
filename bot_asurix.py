@@ -30,13 +30,13 @@ class Bot(commands.Bot):
         if not os.path.exists("settings/infos.json"):
 
             jsonData = {}
-            token = str(input("Please put your bot's token here:\n> "))
+            token = input("Please put your bot's token here:\n> ")
             print("DO NOT SPREAD YOUR BOT'S TOKEN TO ANYONE. NEVER.\n")
-            prefix = str(input("\n\nPlease put your bot's prefix here:\n> "))
-            description = str(input("\n\nPlease put a little description for your bot (optionnal)\n> ")
+            prefix = input("\n\nPlease put your bot's prefix here:\n> ")
+            description = input("\n\nPlease put a little description for your bot (optionnal)\n> ")
             if description == "":
                 description = "A basic bot originally made for Asurix#4727"
-            ownerID = str(input("\n\nPlease put your ID:\n> "))
+            ownerID = input("\n\nPlease put your ID:\n> ")
             
             jsonData["token"] = token
             jsonData["prefix"] = prefix
@@ -71,9 +71,9 @@ class Bot(commands.Bot):
                 super().run(self.token)
             except Exception as e:
                 print("Couldn't log in, your bot's token might be incorrect! If it's not, then check Discord's status here: https://status.discordapp.com/")
-                answer = str(input("Do you want to change your bot's token? (yes/no)\n> "))
+                answer = input("Do you want to change your bot's token? (yes/no)\n> ")
                 if answer.upper() == "YES":
-                    token = str(input("\n\nPlease put your new bot's token here:\n> "))
+                    token = input("\n\nPlease put your new bot's token here:\n> ")
                     jsonData = utils.load_json("settings/infos.json")
                     jsonData["token"] = token
                     self.token = token

@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import requests
 
 
 # USEFUL FUNCTIONS
@@ -12,7 +13,10 @@ else:
 # Install & update the requirements for the bot according to the needed modules listed in requirements.txt
 def installUpdate():
 
-    os.system("pip install --upgrade pip")
+    if subprocess.call('pip', shell = True) != 0:
+        
+    else:
+        os.system("pip install --upgrade pip")
 
     #Get the requirements
     f = open("requirements.txt", "r")
@@ -30,7 +34,7 @@ clear()
 
 returnValue = subprocess.call('git fetch', shell = True)
 if returnValue != 0:
-    answer = str(input("The bot isn't up-to-date, please type 'yes' to update it!\n\n> "))
+    answer = input("The bot isn't up-to-date, please type 'yes' to update it!\n\n> ")
     if answer.upper() == "YES":
         os.system('git pull')
 
@@ -39,11 +43,11 @@ while answer != "4":
     
     clear()
 
-    answer = str(input( "What do you want to do?\n\n" + 
+    answer = input( "What do you want to do?\n\n" + 
                     "1. Install & update requirments\n" +
                     "2. Launch the bot with autorestart\n" +
                     "3. Launch the bot\n" +
-                    "4. Quit\n\n> "))
+                    "4. Quit\n\n> ")
 
     if answer == "1":
         installUpdate()
