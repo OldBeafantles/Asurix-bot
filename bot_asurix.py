@@ -132,6 +132,7 @@ async def on_ready():
     print(str(len(set(bot.get_all_members()))) + " members")
     print("\n" + str(len(bot.loadedModules)) + " modules loaded.")
     bot.inviteLink = "https://discordapp.com/oauth2/authorize?client_id=" + bot.user.id + "&scope=bot"
+    print("\n\nHere's the invitation link for your bot: " + bot.inviteLink)
 
 
 
