@@ -13,10 +13,8 @@ else:
 # Install & update the requirements for the bot according to the needed modules listed in requirements.txt
 def installUpdate():
 
-    if subprocess.call('pip', shell = True) != 0:
-        
-    else:
-        os.system("pip install --upgrade pip")
+
+    os.system("pip install --upgrade pip")
 
     #Get the requirements
     f = open("requirements.txt", "r")
