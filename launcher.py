@@ -42,7 +42,7 @@ while answer != "4":
     clear()
 
     answer = input( "What do you want to do?\n\n" + 
-                    "1. Install & update requirments\n" +
+                    "1. Install & update requirements\n" +
                     "2. Launch the bot with autorestart\n" +
                     "3. Launch the bot\n" +
                     "4. Quit\n\n> ")
