@@ -4,7 +4,7 @@
 
 ## Requirements
 
-* Python 3+ version
+* Python 3.6 version
 * pip module
 * If you're on Linux, you may need to install libffi-dev (`sudo apt-get install libffi-dev`)
 * Others requirements will be automatically installed
