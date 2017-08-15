@@ -12,6 +12,7 @@
 ## Features list
 
 * Inter-channels communication
+* Python code evaluating system (from Danny's bot)
 
 ## Improvments to do
 

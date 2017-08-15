@@ -1,7 +1,6 @@
 import os
 import requests
 import discord
-from io import BytesIO
 from ..utils import utils
 from discord.ext import commands
 

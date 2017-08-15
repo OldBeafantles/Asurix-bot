@@ -119,6 +119,9 @@ class Bot(commands.Bot):
         clear()
 
 
+    def is_owner(self, id : str):
+        return id == self.ownerID
+
 
 
 bot = Bot()
