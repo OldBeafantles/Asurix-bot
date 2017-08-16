@@ -9,6 +9,10 @@
 * If you're on Linux, you may need to install libffi-dev (`sudo apt-get install libffi-dev`)
 * Others requirements will be automatically installed
 
+## Installing
+
+The guide for installing the bot is [here](INSTALLING.md)
+
 ## Features list
 
 * Inter-channels communication
@@ -21,7 +25,7 @@
 * [ ] A safe system to handle rate limits
 * [X] Use of json files to store data
 * [X] Auto-checking of bot updates according to the github repo
-* [ ] A guide for installing the bot
+* [X] A guide for installing the bot
 * [X] A script to install the bot's requirements easily
 
 ### Inter-channels communication

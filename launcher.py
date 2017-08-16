@@ -1,7 +1,6 @@
 import os
 import subprocess
 import sys
-import requests
 
 
 # USEFUL FUNCTIONS
