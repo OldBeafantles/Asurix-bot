@@ -94,17 +94,22 @@ class Communications:
                 
                 if len(msg.attachments) != 0:
                     i = 1
+                    image = False
                     for a in msg.attachments:
                         emote = None
                         extension = a["filename"][a["filename"].rfind("."):]
-                        for e in self.attachmentsExtensions:
-                            if extension in self.attachmentsExtensions[e]:
-                                emote = self.attachmentsEmojis[e]
-                                break
-                        if not emote:
-                            emote = self.attachmentsEmojis["others"]
-                        embedMsg.add_field(name = "Attachment #" + str(i), value = emote + " [" + a["filename"] + "](" + a["url"] + ")", inline = False)
-                        i += 1
+                        if extension in self.attachmentsExtensions["image"] and not image:
+                            image = True
+                            embedMsg.set_image(url = a["url"])
+                        else:
+                            for e in self.attachmentsExtensions:
+                                if extension in self.attachmentsExtensions[e]:
+                                    emote = self.attachmentsEmojis[e]
+                                    break
+                            if not emote:
+                                emote = self.attachmentsEmojis["others"]
+                            embedMsg.add_field(name = "Attachment #" + str(i), value = emote + " [" + a["filename"] + "](" + a["url"] + ")", inline = False)
+                            i += 1
 
                 for c in self.communications:
                     if msg.channel.id in c["channels"]:
