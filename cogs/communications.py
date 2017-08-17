@@ -78,6 +78,7 @@ class Communications:
 
 
     @commands.command(pass_context = True)
+    @checks.is_owner()
     async def add_conv(self, ctx, convName : str, *channels):
         """Adds a conversation
         Parameters:
@@ -112,6 +113,7 @@ class Communications:
 
 
     @commands.command(pass_context = True)
+    @checks.is_owner()
     async def rem_conv(self, ctx, convName : str):
         """Removes a conversation
         Parameters:
@@ -127,6 +129,7 @@ class Communications:
 
 
     @commands.command(pass_context = True)
+    @checks.is_owner()
     async def list_conv(self, ctx):
         """Lists all the conversations"""
         if len(self.communications) != 0:
@@ -141,6 +144,7 @@ class Communications:
             await self.bot.say("There's no conversations! :grimacing:")
 
     @commands.command(pass_context = True)
+    @checks.is_owner()
     async def get_conv_details(self, ctx, convName : str):
         """Shows all the details about a conversation
         Parameters:
@@ -182,6 +186,7 @@ class Communications:
 
 
     @commands.command(pass_context = True)
+    @checks.is_owner()
     async def add_channels_conv(self, ctx, convName : str, *channels):
         """Adds channels to a conversation
         Parameters:
@@ -213,6 +218,7 @@ class Communications:
             await self.bot.say("There's no conversation with such name. To get the list of the conversation, type `[p]list_conv`.")
         
     @commands.command(pass_context = True)
+    @checks.is_owner()
     async def rem_channels_conv(self, ctx, convName : str, *channels):
         """Removes channels from a conversation
         Parameters:

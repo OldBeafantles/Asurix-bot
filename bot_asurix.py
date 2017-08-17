@@ -94,7 +94,7 @@ class Bot(commands.Bot):
  
             try:
                 super().run(self.token, reconnect = True)
-            except Exception as e:
+            except discord.LoginFailure:
                 print("Couldn't log in, your bot's token might be incorrect! If it's not, then check Discord's status here: https://status.discordapp.com/")
                 answer = input("Do you want to change your bot's token? (yes/no)\n> ")
                 if answer.upper() == "YES":
@@ -104,6 +104,9 @@ class Bot(commands.Bot):
                     self.token = token
                     utils.save_json(jsonData, "settings/infos.json")
                     sys.exit(1)
+            except Exception as e:
+                print(e)
+                sys.exit(1)
 
 
 

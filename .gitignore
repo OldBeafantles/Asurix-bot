@@ -1,5 +1,5 @@
-.vscode/*
+.vscode
 discord.log
-settings/*
+settings
+data
 *.pyc
-data/*
