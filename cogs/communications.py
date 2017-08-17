@@ -2,6 +2,7 @@ import os
 import requests
 import discord
 from .utils import utils
+from .utils import checks
 from discord.ext import commands
 
 

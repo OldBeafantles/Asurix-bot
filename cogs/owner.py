@@ -186,6 +186,7 @@ class Owner:
 
 
     @commands.command()
+    @checks.is_owner()
     async def unload(self, module : str):
         """Unloads a module."""
         try:
@@ -197,6 +198,7 @@ class Owner:
             await self.bot.say('\U0001f44c')
 
     @commands.command()
+    @checks.is_owner()
     async def reload(self, module : str):
         """Reloads a module."""
         try:
