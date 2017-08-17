@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
-from modules.utils import utils
+from cogs.utils import utils
 import os
 import logging
 import sys
@@ -68,14 +68,14 @@ class Bot(commands.Bot):
     def loadModules(self):
     
         # Première lancement du bot ou édition manuelle de l'utilisateur
-        if not os.path.exists("settings/modules.json"):
+        if not os.path.exists("settings/cogs.json"):
             jsonData = self.defaultModules
             self.modules = self.defaultModules
-            utils.save_json(jsonData, "settings/modules.json")
+            utils.save_json(jsonData, "settings/cogs.json")
 
-        self.modules = utils.load_json("settings/modules.json")
+        self.modules = utils.load_json("settings/cogs.json")
         for m in self.modules:
-            modulePath = "modules/" + m + "/" + m + ".py"
+            modulePath = "cogs/" + m + ".py"
             moduleName = modulePath.replace('/', '.')[:-3]
             if not os.path.exists(modulePath):
                 print("The cog \"" + m + "\" doesn't exist!")
@@ -112,7 +112,7 @@ class Bot(commands.Bot):
         clear()
         self.checkInfos()
         self.bot = discord.Client()
-        self.defaultModules = ["communications"]
+        self.defaultModules = ["communications", "owner"]
         self.loadedModules = []
         self.inviteLink = ""
         super().__init__(command_prefix = self.prefix, description = self.description)
@@ -122,7 +122,6 @@ class Bot(commands.Bot):
 
     def is_owner(self, id : str):
         return id == self.ownerID
-
 
 
 bot = Bot()

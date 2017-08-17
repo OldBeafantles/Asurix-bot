@@ -14,7 +14,7 @@ Having troubleshoots? Check the [Troubleshooting](#troubleshooting) section!
 
 1. Then, go to this [url](https://discordapp.com/developers/applications/me).
 
-1. Create a new app clicking on the `+` button. ![example](http://i.imgur.com/QtiAkzn.png)
+1. Create a new app clicking on the `+` button.<br> ![example](http://i.imgur.com/QtiAkzn.png)
 
 1. Configure your new application, then click on the `Create App` button. ![example](http://i.imgur.com/3I4tz0P.png)<br>
 
@@ -26,13 +26,13 @@ Here's, this application would have these caracteristics:
 
 **Note**: Changing app's icon / name wouldn't change your bot's avatar / name. It would change your *app's icon / name*. If you wanna change your bot's name / avatar, you would be able to do it directly using bot's commands. (module `Owner`).
 
-1. Click on the `Create a Bot User` button. ![example](http://i.imgur.com/vLyRS0e.png)
+1. Click on the `Create a Bot User` button.<br> ![example](http://i.imgur.com/vLyRS0e.png)
 
 1. Confirm your action clicking on the `Yes, do it!` button. ![example](http://i.imgur.com/tiK6jFt.png)
 
-1. Click on `click to reveal`. ![example](http://i.imgur.com/p4EpyXD.png)
+1. Click on `click to reveal`.<br> ![example](http://i.imgur.com/p4EpyXD.png)
 
-1. Note down your bot's token. ![example](http://i.imgur.com/rcWbpPS.png)
+1. Note down your bot's token.<br> ![example](http://i.imgur.com/rcWbpPS.png)
 
 ⚠️**WARNING**⚠️ **Do NOT spread your bot's token to ANYONE. NEVER**
 
