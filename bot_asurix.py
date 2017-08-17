@@ -81,6 +81,7 @@ class Bot(commands.Bot):
                 print("The cog \"" + m + "\" doesn't exist!")
             else:
                 try:
+                    print("Loading " + m + " module...")
                     module = importlib.import_module(modulePath.replace('/', '.')[:-3])
                     importlib.reload(module)
                     super().load_extension(moduleName)

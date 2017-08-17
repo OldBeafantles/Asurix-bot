@@ -29,7 +29,7 @@ def installUpdate():
 # LAUNCHING THE BOT
 clear()
 
-subprocess.call("git fetch", shell = True)
+subprocess.call("git fetch", stdout = open(os.devnull, 'w'), stderr = subprocess.STDOUT)
 text = subprocess.check_output("git status", shell = True)
 if "Your branch is behind" in str(text):
     answer = input("The bot isn't up-to-date, please type 'yes' to update it!\n\n> ")
