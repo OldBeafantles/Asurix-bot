@@ -2,4 +2,4 @@
 discord.log
 settings/*
 *.pyc
-modules/communications/data/*
+data/*
