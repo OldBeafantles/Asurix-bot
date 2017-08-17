@@ -44,6 +44,7 @@ The guide for installing the bot is [here](INSTALLING.md)
 * Inter-channels communication
   * [X] Bug#1 - Cannot send messages with only attachments/embeds
   * [ ] Bug#2 - Embed's color isn't always correct
+  * [X] Bug#6 - Tuple format instead of list when adding a new communication
 * General
   * [X] Bug#3 - Infinite loop when the bot can't log in
   * [X] Bug#4 - Can't detect if the git repo is outdated

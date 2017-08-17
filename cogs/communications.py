@@ -105,7 +105,7 @@ class Communications:
                 else:
                     await self.bot.say(":warning: I don't have access to the channel with " + c + " as ID! Please ensure the channel exists and that the bot is in the server and have `Read message` + `Send messages` permissions in this channel!")
             
-            self.communications[convName] = channels
+            self.communications[convName] = [x for x in channels]
             utils.save_json(self.communications, "data/communications/communications.json")
             await self.bot.say("Conversation added! :ok_hand:")
 
