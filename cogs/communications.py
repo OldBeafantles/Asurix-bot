@@ -260,12 +260,32 @@ class Communications:
             await self.bot.say("There's no conversation with such name. To get the list of the conversation, type `[p]list_conv`.")
 
 
+    @commands.command(pass_context = True)
+    @checks.is_owner()
+    async def change_conv_name(self, ctx, convName : str, newConvName : str):
+        """Changes the name of a conversation
+        Parameters:
+            convName: The current name of the conversation you want to change the name.
+            newConvName: The new name for the conversation.
+        
+        Example: [p]change_conv_name myFirstConv mySecondConv"""
+        if convName in self.communications:
+            if newConvName not in self.communications:
+                self.communications[newConvName] = self.communications[convName]
+                del self.communications[convName]
+                self.save()
+                await self.bot.say("Done! :ok_hand:")
+            else:
+                await self.bot.say("There's already a conversation called `" + newConvName + "`. Please choose another name!")
+        else:
+            await self.bot.say("There's no conversation with such name. To get the list of the conversation, type `[p]list_conv`.")
+
     async def checkCommunications(self, msg):
 
         if msg.author.id != self.bot.user.id:
             if self.isConcerned(msg.channel.id):
   
-                color = discord.Colour(sorted(msg.author.roles, key = lambda r: r.position, reverse=True)[0].colour.value)
+                color = discord.Colour(sorted(msg.author.roles, key = lambda r: r.position, reverse = True)[0].colour.value)
 
                 embedsToSend = []
                 attachmentsToSend = []
