@@ -30,7 +30,7 @@ The guide for installing the bot is [here](INSTALLING.md)
 
 ### Inter-channels communication
 
-* [ ] Update edited / deleted messages
+* [X] Update edited / deleted messages
 * [X] Unlimited number of channels
 * [X] Unlimited number of communications
 * [X] Notify the user if the bot doesn't have the permissions to send messages / attachments in at least one of the channel of its different registered communications

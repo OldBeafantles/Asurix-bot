@@ -7,14 +7,25 @@ from discord.ext import commands
 
 
 
+class Conversation:
+
+    def __init__(self, channels):
+        self.channels = channels
+        self.messages = []
+
+
 class Communications:
     """Inter-channels communications module"""
 
+    def save(self):
+        data = {}
+        for c in self.communications:
+            data[c] = self.communications[c].channels
+        utils.save_json(data, self.communicationsFilePath)
 
     def parseCommunications(self):
-        
         for conv in self.communications:
-            for c in self.communications[conv]:
+            for c in self.communications[conv].channels:
                 
                 channel = discord.utils.find(lambda x: x.id == c, self.bot.get_all_channels())
 
@@ -32,23 +43,25 @@ class Communications:
 
 
     def loadCommunicationsFile(self):
-        
-        if not os.path.exists("data/communications/communications.json"):
+        self.communications = {}
+        if not os.path.exists(self.communicationsFilePath):
             
             if not os.path.isdir("data/communications"):
                 os.makedirs("data/communications")
             
-            jsonData = {}
-            utils.save_json(jsonData, "data/communications/communications.json")
-        
-        self.communications = utils.load_json("data/communications/communications.json")
-        self.parseCommunications()
+            utils.save_json(self.communications, self.communicationsFilePath)
+        else:
+            conv = utils.load_json(self.communicationsFilePath)
+            for c in conv:
+                self.communications[c] = Conversation(conv[c])
+            self.parseCommunications()
 
     def __init__(self, bot):
         
         # On charge les différentes communications voulues    
         self.bot = bot
         self.ownerID = bot.ownerID
+        self.communicationsFilePath = "data/communications/communications.json"
         self.loadCommunicationsFile()
         self.attachmentsEmojis =        {
                                             "audio" : ":headphones:",
@@ -72,7 +85,7 @@ class Communications:
 
     def isConcerned(self, channelID : str):
         for c in self.communications:
-            for channel in self.communications[c]:
+            for channel in self.communications[c].channels:
                 if channel == channelID:
                     return True
         return False
@@ -105,8 +118,8 @@ class Communications:
                 else:
                     await self.bot.say(":warning: I don't have access to the channel with " + c + " as ID! Please ensure the channel exists and that the bot is in the server and have `Read message` + `Send messages` permissions in this channel!")
             
-            self.communications[convName] = [x for x in channels]
-            utils.save_json(self.communications, "data/communications/communications.json")
+            self.communications[convName] = Conversation([x for x in channels])
+            self.save()
             await self.bot.say("Conversation added! :ok_hand:")
 
         else:
@@ -123,7 +136,7 @@ class Communications:
         Example: [p]rem_conv myFirstConv"""
         if convName in self.communications:
             del self.communications[convName]
-            utils.save_json(self.communications, "data/communications/communications.json")
+            self.save()
             await self.bot.say("The conversation `" + convName + "` has been removed. :ok_hand:")
         else:
             await self.bot.say("There's no conversation with such name. To get the list of the conversation, type `[p]list_conv`.")
@@ -155,7 +168,7 @@ class Communications:
         if convName in self.communications:
             msg = "Details for `" + convName + "`:\n\nChannels:\n---------------\n\n"
             i = 1
-            for c in self.communications[convName]:
+            for c in self.communications[convName].channels:
                 msg += "\t" + str(i) + ") "
                 channel = discord.utils.find(lambda x: x.id == c, self.bot.get_all_channels())
                 if channel:
@@ -199,7 +212,7 @@ class Communications:
         if convName in self.communications:
             msg = ""
             for c in channels:
-                if c not in self.communications[convName]:
+                if c not in self.communications[convName].channels:
                     channel = discord.utils.find(lambda x: x.id == c, self.bot.get_all_channels())
                     if channel:
                         perms = channel.permissions_for(discord.utils.find(lambda m: m.id == self.bot.user.id, channel.server.members))
@@ -209,10 +222,10 @@ class Communications:
                             msg += ":warning: Cant't send messages in " + channel.name + " (server: " + channel.server.name + ").\n"
                     else:
                         msg += ":warning: I don't have access to the channel with " + c + " as ID! Please ensure the channel exists and that the bot is in the server and have \"Read message\" + \"Send messages\" permissions in this channel!\n"
-                    self.communications[convName].append(c)
+                    self.communications[convName].channels.append(c)
                 else:
                     msg += c + " is already registered in this conversation.\n"
-            utils.save_json(self.communications, "data/communications/communications.json")
+            self.save()
             msg += "The channels have been added to the conversation `" + convName + "`."
             await self.bot.say(msg)
         else:
@@ -231,16 +244,16 @@ class Communications:
         if convName in self.communications:
             msg = ""
             for c in channels:
-                if c in self.communications[convName]:
+                if c in self.communications[convName].channels:
                     channel = discord.utils.find(lambda x: x.id == c, self.bot.get_all_channels())
                     if channel:
                         msg += "Channel #" + channel.name + " (server: " + channel.server.name + ") has been removed from the conversation.\n"
                     else:
                         msg += "Channel with " + c + " as ID has been removed from the conversation.\n"
-                    self.communications[convName].remove(c)
+                    self.communications[convName].channels.remove(c)
                 else:
-                    msg += "There's no channel with " + c + " as ID in this conversation.\n"
-            utils.save_json(self.communications, "data/communications/communications.json")
+                    msg += "The re's no channel with " + c + " as ID in this conversation.\n"
+            self.save()
             msg += "\nDone! :ok_hand:"
             await self.bot.say(msg)
         else:
@@ -281,25 +294,36 @@ class Communications:
                             i += 1
 
                 for c in self.communications:
-                    if msg.channel.id in self.communications[c]:
-                        for channel in self.communications[c]:
+                    if msg.channel.id in self.communications[c].channels:
+                        for channel in self.communications[c].channels:
                             if channel != msg.channel.id:
                                 
                                 channelToSend = discord.utils.find(lambda c: c.id == channel, self.bot.get_all_channels())
                                 if channelToSend:
                                     try:
-                                        await self.bot.send_message(channelToSend, embed = embedMsg)
+                                        messageToStore = await self.bot.send_message(channelToSend, embed = embedMsg)
+                                        if len(self.communications[c].messages) == 20:
+                                            del self.communications[c].messages[0]
+                                            self.communications[c].messages[len(self.communications[c].messages) - 1]["embeds"].append([messageToStore, embedMsg])
+                                        elif len(self.communications[c].messages) == 0:
+                                            self.communications[c].messages.append({"id": msg.id, "embeds": [], "reactions": []})
+                                            self.communications[c].messages[len(self.communications[c].messages) - 1]["embeds"].append([messageToStore, embedMsg])
+                                        elif self.communications[c].messages[len(self.communications[c].messages) - 1]["id"] == msg.id:
+                                            self.communications[c].messages[len(self.communications[c].messages) - 1]["embeds"].append([messageToStore, embedMsg])
+                                        else:
+                                            self.communications[c].messages.append({"id": msg.id, "embeds": [], "reactions": []})
+                                            self.communications[c].messages[len(self.communications[c].messages) - 1]["embeds"].append([messageToStore, embedMsg])
                                     except discord.Forbidden:
                                         print("Can't send messages to #" + channelToSend.name + " (server: " + channelToSend.server.name + ")")
                                     except Exception as e:
                                         print(e)
     
     
-    async def checkChannelsDeletions(self, channel):
+    async def checkChannelsDeletes(self, channel):
         owner = discord.utils.find(lambda u: u.id == self.ownerID, self.bot.get_all_members())
         if owner:
             for conv in self.communications:
-                if channel.id in self.communications[conv]:
+                if channel.id in self.communications[conv].channels:
                     await self.bot.send_message(owner, ":warning: The channel \"" + channel.name + "\" in the server \"" + channel.server.name + "\" has been deleted.\n:warning: The communication `" + conv + "` is affected by this change.\nYou can remove this channel from this communication using `rem_channel_conv " + conv + " " + channel.id + "`!")
         else:
             print("The owner has no servers in common with the bot!")
@@ -307,7 +331,7 @@ class Communications:
 
     async def checkChannelsUpdates(self, before, after):
         for conv in self.communications:
-            if after.id in self.communications[conv]:
+            if after.id in self.communications[conv].channels:
                 perms = after.permissions_for(discord.utils.find(lambda m: m.id == self.bot.user.id, after.server.members))
                 owner = discord.utils.find(lambda u: u.id == self.ownerID, self.bot.get_all_members())
                 if owner:
@@ -322,7 +346,7 @@ class Communications:
 
     async def checkRolesChanges(self, before, after):
         for conv in self.communications:
-            for c in self.communications[conv]:
+            for c in self.communications[conv].channels:
                 channel = discord.utils.find(lambda x: x.id == c, after.server.channels)
                 if channel:
                     perms = channel.permissions_for(discord.utils.find(lambda m: m.id == self.bot.user.id, after.server.members))
@@ -339,7 +363,7 @@ class Communications:
 
     async def checkServersDeletes(self, server):
         for conv in self.communications:
-            for c in self.communications[conv]:
+            for c in self.communications[conv].channels:
                 channel = discord.utils.find(lambda x: x.id == c, server.channels)
                 if channel:
                     owner = discord.utils.find(lambda o: o.id == self.ownerID, self.bot.get_all_members())
@@ -351,7 +375,7 @@ class Communications:
 
     async def checkRolesDeletes(self, role):
         for conv in self.communications:
-            for c in self.communications[conv]:
+            for c in self.communications[conv].channels:
                 channel = discord.utils.find(lambda x: x.id == c, role.server.channels)
                 if channel:
                     perms = channel.permissions_for(discord.utils.find(lambda m: m.id == self.bot.user.id, role.server.members))
@@ -368,7 +392,7 @@ class Communications:
     
     async def checkRolesUpdates(self, before, after):
         for conv in self.communications:
-            for c in self.communications[conv]:
+            for c in self.communications[conv].channels:
                 channel = discord.utils.find(lambda x: x.id == c, after.server.channels)
                 if channel:
                     perms = channel.permissions_for(discord.utils.find(lambda m: m.id == self.bot.user.id, after.server.members))
@@ -383,14 +407,38 @@ class Communications:
                         print("The owner has no servers in common with the bot!")
 
 
+    async def checkMessagesEdits(self, before, after):
+        for conv in self.communications:
+            for m in self.communications[conv].messages:
+                if after.id == m["id"]:
+                    for e in m["embeds"]:
+                        try:
+                            e[1].description = after.content
+                            await self.bot.edit_message(e[0], embed = e[1])
+                        except Exception as e:
+                            print(e)
+
+
+    async def checkMessagesDeletes(self, msg):
+        for conv in self.communications:
+            for m in self.communications[conv].messages:
+                if msg.id == m["id"]:
+                    for e in m["embeds"]:
+                        try:
+                            await self.bot.delete_message(e[0])
+                        except Exception:
+                            print(e)
+
 
 def setup(bot):
     mod = Communications(bot)
     bot.add_listener(mod.checkCommunications, "on_message")
-    bot.add_listener(mod.checkChannelsDeletions, "on_channel_delete")
+    bot.add_listener(mod.checkChannelsDeletes, "on_channel_delete")
     bot.add_listener(mod.checkChannelsUpdates, "on_channel_update")
     bot.add_listener(mod.checkRolesChanges, "on_member_update")
     bot.add_listener(mod.checkServersDeletes, "on_server_remove")
     bot.add_listener(mod.checkRolesDeletes, "on_server_role_delete")
     bot.add_listener(mod.checkRolesUpdates, "on_server_role_update")
+    bot.add_listener(mod.checkMessagesEdits, "on_message_edit")
+    bot.add_listener(mod.checkMessagesDeletes, "on_message_delete")
     bot.add_cog(mod)

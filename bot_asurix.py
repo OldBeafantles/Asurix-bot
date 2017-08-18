@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import asyncio
 from cogs.utils import utils
 import os
 import logging
@@ -73,12 +72,13 @@ class Bot(commands.Bot):
             self.modules = self.defaultModules
             utils.save_json(jsonData, "settings/cogs.json")
 
+        print("\n\n")
         self.modules = utils.load_json("settings/cogs.json")
         for m in self.modules:
             modulePath = "cogs/" + m + ".py"
             moduleName = modulePath.replace('/', '.')[:-3]
             if not os.path.exists(modulePath):
-                print("The cog \"" + m + "\" doesn't exist!")
+                print("\n\nThe cog \"" + m + "\" doesn't exist!")
             else:
                 try:
                     print("Loading " + m + " module...")
@@ -88,6 +88,7 @@ class Bot(commands.Bot):
                     self.loadedModules.append(m)
                 except SyntaxError as e:
                     print("Error in " + m + " module:\n\n" + str(e) + "\n\n")
+                    continue
 
 
     def run(self):
