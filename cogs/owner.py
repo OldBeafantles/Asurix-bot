@@ -1,3 +1,5 @@
+"""Owner module"""
+
 import discord
 import traceback
 from discord.ext import commands
