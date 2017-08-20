@@ -72,8 +72,8 @@ class AsurixBot(commands.Bot):
         """Loads the bot modules"""
         # Première lancement du bot ou édition manuelle de l'utilisateur
         if not os.path.exists("settings/cogs.json"):
-            json_data = self.defaultModules
-            self.modules = self.defaultModules
+            json_data = self.default_modules
+            self.modules = self.default_modules
             utils.save_json(json_data, "settings/cogs.json")
 
         print("\n\n")

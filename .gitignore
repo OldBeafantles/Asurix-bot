@@ -3,3 +3,5 @@ discord.log
 settings
 data
 *.pyc
+VPS_private_key.ppk
+VPS_public_key
