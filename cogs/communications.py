@@ -338,10 +338,8 @@ class Communications:
         if msg.author.id != self.bot.user.id:
             if self.is_concerned(msg.channel.id):
 
-                color = discord.Colour(sorted(msg.author.roles, key=lambda r: r.position, \
-                                        reverse=True)[0].colour.value)
-
-                embed_msg = discord.Embed(type="rich", description=msg.content, colour=color)
+                embed_msg = discord.Embed(type="rich", description=msg.content, \
+                                            colour=msg.author.colour)
 
                 embed_msg.set_footer(text="In #" + msg.channel.name + " (server: " + \
                                     msg.server.name + ")", icon_url=msg.server.icon_url)
