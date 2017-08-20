@@ -54,5 +54,4 @@ If you have any problems installing/running the bot, please consult [this](TROUB
 
 ## Development server
 
-If you wanna join the development server:
-<iframe src="https://discordapp.com/widget?id=348276754693095425&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0"></iframe>
+If you wanna join the development server, click [here](https://discord.gg/nXHZF53).
