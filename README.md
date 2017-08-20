@@ -2,13 +2,6 @@
 
 > *Asurix-bot is a basic Discord bot basically made for Asurix#4727 who needed a feature*
 
-## Requirements
-
-* Python 3.6 version
-* pip module
-* If you're on Linux, you may need to install libffi-dev (`sudo apt-get install libffi-dev`)
-* Others requirements will be automatically installed
-
 ## Installing
 
 The guide for installing the bot is [here](INSTALLING.md)
@@ -54,3 +47,12 @@ The guide for installing the bot is [here](INSTALLING.md)
 
 * Bot's profile customization
 * Moderating commands
+
+## Troubleshooting
+
+If you have any problems installing/running the bot, please consult [this](TROUBLESHOOTING.md).
+
+## Development server
+
+If you wanna join the development server:
+<iframe src="https://discordapp.com/widget?id=348276754693095425&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0"></iframe>

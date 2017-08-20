@@ -103,4 +103,4 @@ python3.6 get-pip.py
 
 ## Troubleshooting <a id = "troubleshooting"></a>
 
-Not done yet.
+If you have any problems installing/running the bot, please consult [this](TROUBLESHOOTING.md).
