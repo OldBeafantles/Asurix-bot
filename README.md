@@ -28,9 +28,8 @@ The guide for installing the bot is [here](INSTALLING.md)
 * [X] Unlimited number of communications
 * [X] Notify the user if the bot doesn't have the permissions to send messages / attachments in at least one of the channel of its different registered communications
 * [X] Send a warning if an event (kicks / bans / leaves / channels deletions / channels permissions changes / servers deletions / roles changes) would impact conversations
-* [ ] Group several messages in a row from a same user in an unique embed ![Example](http://i.imgur.com/84PjK2D.png)
 * [X] Proper handler for messages containing attachments
-* [ ] Handling messages reactions
+* [X] Handling messages reactions
 
 ## Bugs
 
