@@ -69,8 +69,10 @@ Use the following commands to install the requirements:
 
 ```bash
 sudo apt-get install python3-dev libffi-dev libssl-dev zlib1g-dev build-essential git
+cd ~
 wget https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tar.xz
 tar xJf Python-3.6.2.tar.xz
+sudo rm Python-3.6.2.tar.xz
 cd Python-3.6.2/
 ./configure --enable-optimizations
 make -j8
@@ -87,13 +89,14 @@ git clone https://www.github.com/Beafantles/Asurix-bot
 
 ```bash
 python3.6 -m venv testenv
-source testenv/bin/activate
+source ~/testenv/bin/activate
 python3.6 launcher.py
 ```
 
 1. If it's your first time running the bot, type `1` to install all the requirements for the bot. ![example](http://i.imgur.com/LTwHOE3.png)
 
-1. Then, type `2` if you want to start the bot and you want it to run all the time, even after being switched off. Type `3` if you want to run the bot *normally*.
+1. Then, type `2` if you want to start the bot.
+
 1. If it's your first time running the bot, you would need to configure it. ![example](http://i.imgur.com/DRE8MIW.png)<br><br>**Note**: If you don't know how could you get your Discord ID, please check the gif below. ![getID](http://i.imgur.com/tgjEleS.gif)
 
 1. If everything went well, you should have something similar to that: ![yay](http://i.imgur.com/CSXcSO2.png)
