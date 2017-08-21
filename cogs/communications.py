@@ -682,7 +682,7 @@ class Communications:
 
                     if index != -1:
                         msg["embed"].remove_field(index)
-                    
+
                     for message_sent in msg["messages"]:
                         try:
                             await self.bot.edit_message(message_sent, embed=msg["embed"])

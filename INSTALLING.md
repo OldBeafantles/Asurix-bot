@@ -65,30 +65,31 @@ Please follow the instructions for your OS:
 
 ### Linux <a id = linux></a>
 
-1. Install git package using `sudo apt-get install git` command in a terminal.
-
-1. You may also need the `libffi` package (depending on your Linux distribution). You can install it running this command: `sudo apt-get install libffi-dev`.
-
-1. You may also need the `zlib` package (depending on your Linux distribution). You can install it running this command: `sudo apt-get install zlib1g-dev`.
-1. Install Python 3.6.2 and pip module using the following commands:
+Use the following commands to install the requirements:
 
 ```bash
+sudo apt-get install python3-dev libffi-dev libssl-dev zlib1g-dev build-essential git
 wget https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tar.xz
 tar xJf Python-3.6.2.tar.xz
 cd Python-3.6.2/
 ./configure --enable-optimizations
-make
-make install
+make -j8
+sudo make altinstall
 cd ..
-wget https://bootstrap.pypa.io/get-pip.py
-python3.6 get-pip.py
+git clone https://www.github.com/Beafantles/Asurix-bot
 ```
 
 ## Launching the bot <a id = launch></a>
 
 1. Go to the directory `Asurix-bot`.
 
-1. If you're on Windows, just double-click on the file `start.bat`. If you're on Linux, open a terminal in this directory and type `python3.6 launcher.py`.
+1. If you're on Windows, just double-click on the file `start.bat`. <br>If you're on Linux, open a terminal in this directory and type the following commands:
+
+```bash
+python3.6 -m venv testenv
+source testenv/bin/activate
+python3.6 launcher.py
+```
 
 1. If it's your first time running the bot, type `1` to install all the requirements for the bot. ![example](http://i.imgur.com/LTwHOE3.png)
 
