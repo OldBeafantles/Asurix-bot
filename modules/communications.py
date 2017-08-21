@@ -3,8 +3,8 @@
 import os
 import discord
 from discord.ext import commands
-from cogs.utils import checks
-from cogs.utils import utils
+from modules.utils import checks
+from modules.utils import utils
 
 
 

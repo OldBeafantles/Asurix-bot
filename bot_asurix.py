@@ -1,12 +1,13 @@
 """Asurix-bot file"""
 
 import os
-import logging
 import sys
 import importlib
+
+from datetime import datetime, timedelta
 import discord
 from discord.ext import commands
-from cogs.utils import utils
+from modules.utils import utils
 
 # Useful functions
 if sys.platform == "win32" or sys.platform == "win64":
@@ -14,25 +15,18 @@ if sys.platform == "win32" or sys.platform == "win64":
 else:
     CLEAR = lambda: os.system("clear")
 
-# Logger
-LOGGER = logging.getLogger('discord')
-LOGGER.setLevel(logging.DEBUG)
-HANDLER = logging.FileHandler(filename="discord.log", encoding='utf-8', mode='w')
-HANDLER.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-LOGGER.addHandler(HANDLER)
-
 
 class AsurixBot(commands.Bot):
     """The bot class"""
     # pylint: disable=too-many-instance-attributes
-    def check_infos(self):
-        """Loads "settings/infos.json", gets the infos if the file doesn't exists"""
-        # Première lancement du bot ou édition manuelle de l'utilisateur
-        if not os.path.exists("settings/infos.json"):
+    def load_config(self):
+        """Loads self.config_file_path, gets the infos if the file doesn't exists"""
+        # Premier lancement du bot ou édition manuelle de l'utilisateur
+        if not os.path.exists(self.config_file_path):
 
             json_data = {}
             token = input("Please put your bot's token here:\n> ")
-            print("DO NOT SPREAD YOUR BOT'S TOKEN TO ANYONE. NEVER.\n")
+            print("DO NOT SPREAD YOUR bot'S TOKEN TO ANYONE. NEVER.\n")
             prefix = input("\n\nPlease put your bot's prefix here:\n> ")
             description = input("\n\nPlease put a little description for your bot (optionnal)\n> ")
             if description == "":
@@ -42,7 +36,7 @@ class AsurixBot(commands.Bot):
             json_data["token"] = token
             json_data["prefix"] = prefix
             json_data["description"] = description
-            json_data["ownerID"] = owner_id
+            json_data["owner id"] = owner_id
             self.token = token
             self.prefix = prefix
             self.description = description
@@ -51,38 +45,75 @@ class AsurixBot(commands.Bot):
             if not os.path.isdir("settings"):
                 os.makedirs("settings")
 
-            utils.save_json(json_data, "settings/infos.json")
+            utils.save_json(json_data, self.config_file_path)
 
         else:
-            json_data = utils.load_json("settings/infos.json")
-            if not json_data["token"] or not json_data["prefix"] \
-            or not json_data["description"] or not json_data["ownerID"]:
-                print("\"settings/infos.json\" is incorrect! The bot will be reseted, " \
+            json_data = utils.load_json(self.config_file_path)
+            if not "token" in json_data or not "prefix" in json_data \
+            or not "description" in json_data or not "owner id" in json_data:
+                print("\"settings/config.json\" is incorrect! The bot will be reseted, " \
                         + "please restart the bot!")
-                os.remove("settings/infos.json")
+                os.remove(self.config_file_path)
                 sys.exit(1)
             else:
                 self.token = json_data["token"]
                 self.prefix = json_data["prefix"]
                 self.description = json_data["description"]
-                self.owner_id = json_data["ownerID"]
+                self.owner_id = json_data["owner id"]
+
+
+    def reset_infos(self):
+        """Resets bot's info"""
+        json_data = {}
+        json_data["created at"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        json_data["total commands"] = 0
+        json_data["total runtime"] = 0
+        self.created_at = datetime.now()
+        self.total_commands = 0
+        self.total_runtime = timedelta(seconds=0)
+
+        # Ne devrait pas être nécessaire étant donné que load_config
+        # est appelé juste avant mais on ne sait jamais...
+        if not os.path.isdir("settings"):
+            os.makedirs("settings")
+
+        utils.save_json(json_data, self.info_file_path)
+
+    def load_infos(self):
+        """Load bot's info"""
+        # Premier lancement du bot ou édition manuelle de l'utilisateur
+        if not os.path.exists(self.info_file_path):
+            self.reset_infos()
+        else:
+            json_data = utils.load_json(self.info_file_path)
+            if not "created at" in json_data or not "total commands" in json_data \
+                                            or not "total runtime" in json_data:
+                print("\"settings/infos.json\" is incorrect! The info of " + \
+                    "the bot will be reseted!")
+                self.reset_infos()
+            else:
+                self.created_at = datetime.strptime(json_data["created at"], "%d/%m/%Y %H:%M:%S")
+                self.total_commands = json_data["total commands"]
+                self.total_runtime = timedelta(seconds=json_data["total runtime"])
 
 
     def load_modules(self):
         """Loads the bot modules"""
         # Première lancement du bot ou édition manuelle de l'utilisateur
-        if not os.path.exists("settings/cogs.json"):
+        if not os.path.exists("settings/modules.json"):
             json_data = self.default_modules
             self.modules = self.default_modules
-            utils.save_json(json_data, "settings/cogs.json")
+            utils.save_json(json_data, "settings/modules.json")
 
         print("\n\n")
-        self.modules = utils.load_json("settings/cogs.json")
+        self.modules = utils.load_json("settings/modules.json")
         for mod in self.modules:
-            module_path = "cogs/" + mod + ".py"
+            module_path = "modules/" + mod + ".py"
             module_name = module_path.replace('/', '.')[:-3]
             if not os.path.exists(module_path):
-                print("\n\nThe cog \"" + mod + "\" doesn't exist!")
+                print("\n\nThe module \"" + mod + "\" doesn't exist!")
+                self.modules.remove(mod)
+                utils.save_json(self.modules, "settings/modules.json")
             else:
                 try:
                     print("Loading " + mod + " module...")
@@ -92,33 +123,9 @@ class AsurixBot(commands.Bot):
                     self.loaded_modules.append(mod)
                 except SyntaxError as ex:
                     print("Error in " + mod + " module:\n\n" + str(ex) + "\n\n")
+                    self.modules.remove(mod)
+                    utils.save_json(self.modules, "settings/modules.json")
                     continue
-
-
-    def run(self, *args, **kwargs):
-        """Runs the bot"""
-        try:
-            super().run(self.token, reconnect=True)
-        except discord.LoginFailure:
-            print("Couldn't log in, your bot's token might be incorrect! If it's not, "\
-                    + "then check Discord's status here: https://status.discordapp.com/")
-            answer = input("Do you want to change your bot's token? (yes/no)\n> ")
-            if answer.upper() == "YES":
-                token = input("\n\nPlease put your new bot's token here:\n> ")
-                json_data = utils.load_json("settings/infos.json")
-                json_data["token"] = token
-                self.token = token
-                utils.save_json(json_data, "settings/infos.json")
-                sys.exit(1)
-        except discord.GatewayNotFound:
-            print("Gateway not found! The problem comes from Discord.")
-            sys.exit(1)
-        except discord.ConnectionClosed:
-            print("No more connection.")
-            sys.exit(1)
-        except discord.HTTPException:
-            print("HTTP Error.")
-            sys.exit(1)
 
 
     def __init__(self):
@@ -128,12 +135,20 @@ class AsurixBot(commands.Bot):
         self.prefix = ""
         self.description = ""
         self.owner_id = ""
-        self.check_infos()
+        self.config_file_path = "settings/config.json"
+        self.load_config()
+        self.created_at = None
+        self.total_commands = 0
+        self.total_runtime = None
+        self.info_file_path = "settings/infos.json"
+        self.load_infos()
         self.bot = discord.Client()
-        self.default_modules = ["communications", "owner"]
+        self.default_modules = ["base", "communications"]
         self.loaded_modules = []
         self.invite_link = ""
         self.modules = []
+        self.version = "0.0.1"
+        self.launched_at = None
         super().__init__(command_prefix=self.prefix, description=self.description)
 
         CLEAR()
@@ -142,21 +157,3 @@ class AsurixBot(commands.Bot):
     def is_owner(self, userid: str):
         """Returns true if the id provided is the owner id"""
         return userid == self.owner_id
-
-
-BOT = AsurixBot()
-
-@BOT.event
-async def on_ready():
-    """Triggers when the bot just logged in"""
-    print("Logged in as " + BOT.user.name + "#" + BOT.user.discriminator)
-    print(str(len(BOT.servers))+ " servers")
-    print(str(len(set(BOT.get_all_channels()))) + " channels")
-    print(str(len(set(BOT.get_all_members()))) + " members")
-    BOT.invite_link = "https://discordapp.com/oauth2/authorize?client_id=" \
-                        + BOT.user.id + "&scope=bot"
-    print("\nHere's the invitation link for your bot: " + BOT.invite_link)
-    BOT.load_modules()
-    print("\n" + str(len(BOT.loaded_modules)) + " modules loaded.")
-
-BOT.run()

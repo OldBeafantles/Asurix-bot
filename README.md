@@ -9,7 +9,7 @@ The guide for installing the bot is [here](INSTALLING.md)
 ## Features list
 
 * Inter-channels communication
-* Python code evaluating system (from Danny's bot)
+* Basic bot's configuration
 
 ## Improvments to do
 
@@ -21,7 +21,7 @@ The guide for installing the bot is [here](INSTALLING.md)
 * [X] A guide for installing the bot
 * [X] A script to install the bot's requirements easily
 
-### Inter-channels communication
+### Communications modules
 
 * [X] Update edited / deleted messages
 * [X] Unlimited number of channels
@@ -30,6 +30,10 @@ The guide for installing the bot is [here](INSTALLING.md)
 * [X] Send a warning if an event (kicks / bans / leaves / channels deletions / channels permissions changes / servers deletions / roles changes) would impact conversations
 * [X] Proper handler for messages containing attachments
 * [X] Handling messages reactions
+
+### Base module
+
+* [ ] Show the delay between local bot's version and official bot's version (on Github)
 
 ## Bugs
 
