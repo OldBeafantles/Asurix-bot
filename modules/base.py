@@ -16,8 +16,8 @@ import subprocess
 from datetime import datetime, timedelta
 
 
-class Owner:
-    """Owner commands"""
+class Base:
+    """Basic commands"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -365,7 +365,7 @@ class Owner:
             *game:  The game you want to set for the bot's stream
                     Leaving this blank will remove bot's stream status
 
-        Example: [p]set_stream coding myself!"""
+        Example: [p]set_stream https://www.twitch.tv/beafantles coding myself!"""
         try:
             if stream_link != "":
                 if stream_link.startswith("https://www.twitch.tv/"):
@@ -491,4 +491,4 @@ class Owner:
 
 
 def setup(bot):
-    bot.add_cog(Owner(bot))
+    bot.add_cog(Base(bot))
