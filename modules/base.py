@@ -14,6 +14,7 @@ import requests
 from os import listdir
 import subprocess
 from datetime import datetime, timedelta
+import platform
 
 
 class Base:
@@ -439,7 +440,6 @@ class Base:
 
 
     @commands.command(pass_context=True)
-    @checks.is_owner()
     async def info(self, ctx):
         """Show bot's info"""
         embed = discord.Embed(title="Bot's info", type="rich embed")
@@ -451,10 +451,17 @@ class Base:
 
 
         python_version = str(subprocess.check_output("python --version", shell=True))[2:-5]
+        python_version += " " + platform.architecture()[0][:-3] + " bits"
         commit = str(subprocess.check_output("git rev-parse HEAD", shell=True))[2:-3]
+        os_infos = "Running on " + platform.platform()
+        if platform.machine().endswith("64"):
+            os_infos += " 64 bits"
+        else:
+            os_infos += " 32 bits"
         embed.add_field(name="Python's version", value=python_version)
         embed.add_field(name="Commit", value=commit)
         embed.add_field(name="Bot's version", value=self.bot.version)
+        embed.add_field(name="Environment", value=os_infos)
 
         embed.add_field(name="Total commands typed", value=str(self.bot.total_commands + 1))
         delta = (datetime.now() - self.bot.launched_at) + self.bot.total_runtime
@@ -484,10 +491,17 @@ class Base:
     async def version(self):
         """Shows bot's version"""
         python_version = str(subprocess.check_output("python --version", shell=True))[2:-5]
+        python_version += " " + platform.architecture()[0][:-3] + " bits"
         commit = str(subprocess.check_output("git rev-parse HEAD", shell=True))[2:-3]
+        os_infos = "Running on " + platform.platform()
+        if platform.machine().endswith("64"):
+            os_infos += " 64 bits"
+        else:
+            os_infos += " 32 bits"
         await self.bot.say("Python version: " + python_version + "\n" + \
-                            "Commit: " + commit + "\n\n" + \
-                            "Bot's version: " + self.bot.version) 
+                           "Commit: " + commit + "\n" + \
+                           "Bot's version: " + self.bot.version + "\n" + \
+                           "Environment: " + os_infos) 
 
 
 def setup(bot):
