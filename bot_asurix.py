@@ -100,20 +100,20 @@ class AsurixBot(commands.Bot):
     def load_modules(self):
         """Loads the bot modules"""
         # Première lancement du bot ou édition manuelle de l'utilisateur
-        if not os.path.exists("settings/modules.json"):
+        if not os.path.exists(self.modules_file_path):
             json_data = self.default_modules
             self.modules = self.default_modules
-            utils.save_json(json_data, "settings/modules.json")
+            utils.save_json(json_data, self.modules_file_path)
 
         print("\n\n")
-        self.modules = utils.load_json("settings/modules.json")
+        self.modules = utils.load_json(self.modules_file_path)
+        to_remove = []
         for mod in self.modules:
             module_path = "modules/" + mod + ".py"
             module_name = module_path.replace('/', '.')[:-3]
             if not os.path.exists(module_path):
                 print("\n\nThe module \"" + mod + "\" doesn't exist!")
-                self.modules.remove(mod)
-                utils.save_json(self.modules, "settings/modules.json")
+                to_remove.append(mod)
             else:
                 try:
                     print("Loading " + mod + " module...")
@@ -123,12 +123,14 @@ class AsurixBot(commands.Bot):
                     self.loaded_modules.append(mod)
                 except SyntaxError as ex:
                     print("Error in " + mod + " module:\n\n" + str(ex) + "\n\n")
-                    self.modules.remove(mod)
-                    utils.save_json(self.modules, "settings/modules.json")
-                    continue
+                    to_remove.append(mod)
+        for mod in to_remove:
+            self.modules.remove(mod)
+        if to_remove:
+            utils.save_json(self.modules, self.modules_file_path)
 
 
-    def __init__(self):
+    def __init__(self, loop):
 
         CLEAR()
         self.token = ""
@@ -145,11 +147,12 @@ class AsurixBot(commands.Bot):
         self.bot = discord.Client()
         self.default_modules = ["base", "communications"]
         self.loaded_modules = []
+        self.modules_file_path = "settings/modules.json"
         self.invite_link = ""
         self.modules = []
         self.version = "0.0.1"
         self.launched_at = None
-        super().__init__(command_prefix=self.prefix, description=self.description)
+        super().__init__(command_prefix=self.prefix, description=self.description, loop=loop)
 
         CLEAR()
 

@@ -35,6 +35,11 @@ The guide for installing the bot is [here](INSTALLING.md)
 
 * [ ] Show the delay between local bot's version and official bot's version (on Github)
 
+### Hungers games modules (not released yet)
+
+* [X] Translating system
+* [ ] More possibilities
+
 ## Bugs
 
 * Inter-channels communication
@@ -45,11 +50,13 @@ The guide for installing the bot is [here](INSTALLING.md)
   * [X] Bug#3 - Infinite loop when the bot can't log in
   * [X] Bug#4 - Can't detect if the git repo is outdated
   * [X] Bug#5 - Clear function doesn't work on non-Windows OS
+  * [X] Bug#7 - Can't load remaining modules at bot's start if one of them was wrong.
 
 ## Upcoming features
 
 * Bot's profile customization
 * Moderating commands
+* Hunger games module
 
 ## Troubleshooting
 
