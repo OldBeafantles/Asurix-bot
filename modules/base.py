@@ -24,7 +24,10 @@ class Base:
         self.bot = bot
         self.last_result = None
         self.sessions = set()
+        self.infos_updater = self.bot.loop.create_task(self.update_infos())
 
+    def __unload(self):
+        self.infos_updater.cancel()
 
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""
@@ -65,7 +68,21 @@ class Base:
             msg += str(s) + "s "
         return msg[:-1]
 
-        
+    def save_infos(self):
+        json_data = {}
+        delta = datetime.now() - self.bot.launched_at
+        json_data["total runtime"] = (self.bot.total_runtime + delta).seconds
+        json_data["total commands"] = self.bot.total_commands
+        json_data["created at"] = self.bot.created_at.strftime("%d/%m/%Y %H:%M:%S")
+        utils.save_json(json_data, self.bot.info_file_path)
+
+
+    async def update_infos(self):
+        while not self.bot.is_closed:
+            self.save_infos()
+            await asyncio.sleep(60)
+
+
     @commands.command(pass_context=True, hidden=True, name='eval')
     @checks.is_owner()
     async def eval(self, ctx, *, body: str):
@@ -211,6 +228,7 @@ class Base:
         try:
             self.bot.load_extension("modules." + module)
             self.bot.loaded_modules.append(module)
+            utils.save_json(self.bot.loaded_modules, self.bot.modules_file_path)
         except Exception as e:
             await self.bot.say('\U0001f52b')
             await self.bot.say('{}: {}'.format(type(e).__name__, e))
@@ -226,6 +244,7 @@ class Base:
             try:
                 self.bot.unload_extension("modules." + module)
                 self.bot.loaded_modules.remove(module)
+                utils.save_json(self.bot.loaded_modules, self.bot.modules_file_path)
             except Exception as e:
                 await self.bot.say('\U0001f52b')
                 await self.bot.say('{}: {}'.format(type(e).__name__, e))
@@ -242,9 +261,11 @@ class Base:
             if module in self.bot.loaded_modules:
                 self.bot.unload_extension("modules." + module)
                 self.bot.loaded_modules.remove(module)
+                utils.save_json(self.bot.loaded_modules, self.bot.modules_file_path)
             
             self.bot.load_extension("modules." + module)
             self.bot.loaded_modules.append(module)
+            utils.save_json(self.bot.loaded_modules, self.bot.modules_file_path)
         except Exception as e:
             await self.bot.say('\U0001f52b')
             await self.bot.say('{}: {}'.format(type(e).__name__, e))
@@ -269,12 +290,7 @@ class Base:
     @checks.is_owner()
     async def shutdown(self):
         """Shutdowns the bot"""
-        json_data = {}
-        delta = datetime.now() - self.bot.launched_at
-        json_data["total runtime"] = (self.bot.total_runtime + delta).seconds
-        json_data["total commands"] = self.bot.total_commands
-        json_data["created at"] = self.bot.created_at.strftime("%d/%m/%Y %H:%M:%S")
-        utils.save_json(json_data, self.bot.info_file_path)
+        self.save_infos()
         await self.bot.say("Bye! :wave:")
         await self.bot.logout()
 
@@ -430,14 +446,34 @@ class Base:
                 index = int(answer.content)
                 server_to_leave = discord.utils.find(lambda x: \
                         x.id == servers[index - 1], self.bot.servers)
-                await self.bot.leave_server(server_to_leave)
-                await self.bot.say("Done! :ok_hand:")
+                await self.bot.say("If you want to leave this server, type `yes`!")
+                def check(msg):
+                    return msg.content.lower() == "yes"
+                answer = await self.bot.wait_for_message(timeout=60, author=ctx.message.author, channel=ctx.message.channel, check=check)
+                if answer:
+                    try:
+                        await self.bot.leave_server(ctx.message.server)
+                        await self.bot.say("Done! :ok_hand:")
+                    except discord.HTTPException:
+                        await self.bot.say("HTTP Error")
             except ValueError:
                 pass
+
+
+    @commands.command(pass_context=True)
+    @checks.is_owner()
+    async def leave_server(self, ctx):
+        """Leaves the current server"""
+        await self.bot.say("If you want to leave this server, type `yes`!")
+        def check(msg):
+            return msg.content.lower() == "yes"
+        answer = await self.bot.wait_for_message(timeout=60, author=ctx.message.author, channel=ctx.message.channel, check=check)
+        if answer:
+            try:
+                await self.bot.say("Bye! :wave:")
+                await self.bot.leave_server(ctx.message.server)
             except discord.HTTPException:
                 await self.bot.say("HTTP Error")
-
-
 
     @commands.command(pass_context=True)
     async def info(self, ctx):
