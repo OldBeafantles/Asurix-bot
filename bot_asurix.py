@@ -151,7 +151,7 @@ class AsurixBot(commands.Bot):
         self.invite_link = ""
         self.modules = []
         self.version = "0.0.1"
-        self.launched_at = None
+        self.launched_at = datetime.now()
         super().__init__(command_prefix=self.prefix, description=self.description, loop=loop)
 
         CLEAR()
