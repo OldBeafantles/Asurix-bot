@@ -47,7 +47,7 @@ class Base:
 
     def get_timedelta_str(self, delta: timedelta):
         msg = ""
-        s = delta.seconds
+        s = int(delta.total_seconds())
         years = s // 3153600
         if years != 0:
             msg += str(years) + "y "
@@ -71,7 +71,7 @@ class Base:
     def save_infos(self):
         json_data = {}
         delta = datetime.now() - self.bot.launched_at
-        json_data["total runtime"] = (self.bot.total_runtime + delta).seconds
+        json_data["total runtime"] = int((self.bot.total_runtime + delta).total_seconds())
         json_data["total commands"] = self.bot.total_commands
         json_data["created at"] = self.bot.created_at.strftime("%d/%m/%Y %H:%M:%S")
         utils.save_json(json_data, self.bot.info_file_path)
@@ -231,7 +231,7 @@ class Base:
             utils.save_json(self.bot.loaded_modules, self.bot.modules_file_path)
         except Exception as e:
             await self.bot.say('\U0001f52b')
-            await self.bot.say('{}: {}'.format(type(e).__name__, e))
+            await self.bot.say(str(e))
         else:
             await self.bot.say('\U0001f44c')
 
@@ -247,7 +247,7 @@ class Base:
                 utils.save_json(self.bot.loaded_modules, self.bot.modules_file_path)
             except Exception as e:
                 await self.bot.say('\U0001f52b')
-                await self.bot.say('{}: {}'.format(type(e).__name__, e))
+                await self.bot.say(str(e))
             else:
                 await self.bot.say('\U0001f44c')
         else:
@@ -268,7 +268,7 @@ class Base:
             utils.save_json(self.bot.loaded_modules, self.bot.modules_file_path)
         except Exception as e:
             await self.bot.say('\U0001f52b')
-            await self.bot.say('{}: {}'.format(type(e).__name__, e))
+            await self.bot.say(str(e))
         else:
             await self.bot.say('\U0001f44c')
 
@@ -482,6 +482,7 @@ class Base:
         embed.set_thumbnail(url=discord.utils.find(lambda x: x.id == self.bot.user.id, \
                                                 ctx.message.server.members).avatar_url)
         delta = datetime.now() - self.bot.created_at
+        print(delta)
         embed.set_footer(text="Created at " + self.bot.created_at.strftime("%d/%m/%Y %H:%M:%S") + " (" + \
                             self.get_timedelta_str(delta) + " ago)")
 
