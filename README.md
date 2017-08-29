@@ -36,6 +36,11 @@ The guide for installing the bot is [here](INSTALLING.md)
 * [ ] Show the delay between local bot's version and official bot's version (on Github)
 * [ ] Remember bot's game / stream status
 
+### Admin module
+
+* [ ] Kick / Mute / Ban system
+* [ ] Moderations logs system
+
 ### Hungers games modules (not released yet)
 
 * [X] Translating system

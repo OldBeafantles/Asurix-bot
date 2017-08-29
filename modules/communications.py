@@ -335,7 +335,7 @@ class Communications:
         # pylint: disable=too-many-statements
         # pylint: disable=too-many-branches
         # pylint: disable=too-many-nested-blocks
-        if msg.author.id != self.bot.user.id:
+        if msg.author.id != self.bot.user.id and msg.author.id not in self.bot.blacklist:
             if self.is_concerned(msg.channel.id):
 
                 embed_msg = discord.Embed(type="rich", description=msg.content, \
@@ -538,29 +538,33 @@ class Communications:
     async def check_messages_edits(self, before, after):
         """Check for messages edits"""
         #pylint: disable=unused-argument
-        for conv in self.communications:
-            for msg in self.communications[conv].messages:
-                if after.id == msg["id"]:
-                    msg["embed"].description = after.content
-                    for message in msg["messages"]:
-                        try:
-                            await self.bot.edit_message(message, embed=msg["embed"])
-                        except discord.HTTPException:
-                            pass
+        #pylint: disable=too-many-nested-blocks
+        if after.author.id not in self.bot.blacklist:
+            for conv in self.communications:
+                for msg in self.communications[conv].messages:
+                    if after.id == msg["id"]:
+                        msg["embed"].description = after.content
+                        for message in msg["messages"]:
+                            try:
+                                await self.bot.edit_message(message, embed=msg["embed"])
+                            except discord.HTTPException:
+                                pass
 
 
     async def check_messages_deletes(self, msg):
         """Checks for messages deletions"""
-        for conv in self.communications:
-            for message in self.communications[conv].messages:
-                if msg.id == message["id"]:
-                    for message_sent in message["messages"]:
-                        try:
-                            await self.bot.delete_message(message_sent)
-                        except discord.Forbidden:
-                            print("What?!!! o_O")
-                        except discord.HTTPException:
-                            pass
+        #pylint: disable=too-many-nested-blocks
+        if msg.author.id not in self.bot.blacklist:
+            for conv in self.communications:
+                for message in self.communications[conv].messages:
+                    if msg.id == message["id"]:
+                        for message_sent in message["messages"]:
+                            try:
+                                await self.bot.delete_message(message_sent)
+                            except discord.Forbidden:
+                                print("What?!!! o_O")
+                            except discord.HTTPException:
+                                pass
 
 
     async def check_reactions_add(self, reaction, user):
@@ -568,126 +572,130 @@ class Communications:
         #pylint: disable=unused-argument
         #pylint: disable=too-many-nested-blocks
         #pylint: disable=too-many-branches
-        for com in self.communications:
-            for msg in self.communications[com].messages:
-                if reaction.message.id == msg["id"]:
-                    emoji_id = ""
-                    emoji_output = ""
-                    if isinstance(reaction.emoji, str):
-                        emoji_id = reaction.emoji
-                        emoji_output = emoji_id
-                    else:
-                        emoji_id = reaction.emoji.id
-                        emoji_output = ":" + reaction.emoji.name + ":"
+        if user.id not in self.bot.blacklist:
+            for com in self.communications:
+                for msg in self.communications[com].messages:
+                    if reaction.message.id == msg["id"]:
+                        emoji_id = ""
+                        emoji_output = ""
+                        if isinstance(reaction.emoji, str):
+                            emoji_id = reaction.emoji
+                            emoji_output = emoji_id
+                        else:
+                            emoji_id = reaction.emoji.id
+                            emoji_output = ":" + reaction.emoji.name + ":"
 
-                    if emoji_id not in msg["reactions"]:
-                        msg["reactions"][emoji_id] = 1
-                    else:
-                        msg["reactions"][emoji_id] += 1
+                        if emoji_id not in msg["reactions"]:
+                            msg["reactions"][emoji_id] = 1
+                        else:
+                            msg["reactions"][emoji_id] += 1
 
-                    index = -1
-                    for i in range(0, len(msg["embed"].fields)):
-                        if msg["embed"].fields[i].name == "Reactions":
-                            index = i
-                            break
+                        index = -1
+                        for i in range(0, len(msg["embed"].fields)):
+                            if msg["embed"].fields[i].name == "Reactions":
+                                index = i
+                                break
 
-                    old_value = ""
-                    if index != -1:
-                        old_value = msg["embed"].fields[index].value
+                        old_value = ""
+                        if index != -1:
+                            old_value = msg["embed"].fields[index].value
 
-                    new_value = ""
-                    if msg["reactions"][emoji_id] == 1:
-                        new_value = old_value + emoji_output + " - 1\n"
-                    else:
                         new_value = ""
-                        for line in msg["embed"].fields[index].value.splitlines():
-                            if line.startswith(emoji_output):
-                                line_index = line.find(" - ")
-                                new_value += line[:line_index + 3] + \
-                                            str(int(line[line_index + 3:]) + 1) + "\n"
-                            else:
-                                new_value += line + "\n"
-                    if index == -1:
-                        msg["embed"].add_field(name="Reactions", inline=False, value=new_value)
-                    else:
-                        msg["embed"].remove_field(index)
-                        msg["embed"].add_field(name="Reactions", inline=False, value=new_value)
+                        if msg["reactions"][emoji_id] == 1:
+                            new_value = old_value + emoji_output + " - 1\n"
+                        else:
+                            new_value = ""
+                            for line in msg["embed"].fields[index].value.splitlines():
+                                if line.startswith(emoji_output):
+                                    line_index = line.find(" - ")
+                                    new_value += line[:line_index + 3] + \
+                                                str(int(line[line_index + 3:]) + 1) + "\n"
+                                else:
+                                    new_value += line + "\n"
+                        if index == -1:
+                            msg["embed"].add_field(name="Reactions", inline=False, value=new_value)
+                        else:
+                            msg["embed"].remove_field(index)
+                            msg["embed"].add_field(name="Reactions", inline=False, value=new_value)
 
-                    for message_sent in msg["messages"]:
-                        try:
-                            await self.bot.edit_message(message_sent, embed=msg["embed"])
-                        except discord.HTTPException:
-                            pass
+                        for message_sent in msg["messages"]:
+                            try:
+                                await self.bot.edit_message(message_sent, embed=msg["embed"])
+                            except discord.HTTPException:
+                                pass
 
     async def check_reactions_remove(self, reaction, user):
         """Check for reactions deletions"""
         #pylint: disable=unused-argument
         #pylint: disable=too-many-nested-blocks
         #pylint: disable=too-many-branches
-        for com in self.communications:
-            for msg in self.communications[com].messages:
-                if reaction.message.id == msg["id"]:
-                    emoji_id = ""
-                    emoji_output = ""
-                    if isinstance(reaction.emoji, str):
-                        emoji_id = reaction.emoji
-                        emoji_output = emoji_id
-                    else:
-                        emoji_id = reaction.emoji.id
-                        emoji_output = ":" + reaction.emoji.name + ":"
-
-                    msg["reactions"][emoji_id] -= 1
-                    if msg["reactions"][emoji_id] == 0:
-                        del msg["reactions"][emoji_id]
-
-                    for i in range(0, len(msg["embed"].fields)):
-                        if msg["embed"].fields[i].name == "Reactions":
-                            index = i
-                            break
-
-                    new_value = ""
-                    for line in msg["embed"].fields[index].value.splitlines():
-                        if line.startswith(emoji_output):
-                            if emoji_id in msg["reactions"]:
-                                line_index = line.find(" - ")
-                                new_value += line[:line_index + 3] + \
-                                                str(int(line[line_index + 3:]) - 1) + "\n"
+        if user.id not in self.bot.blacklist:
+            for com in self.communications:
+                for msg in self.communications[com].messages:
+                    if reaction.message.id == msg["id"]:
+                        emoji_id = ""
+                        emoji_output = ""
+                        if isinstance(reaction.emoji, str):
+                            emoji_id = reaction.emoji
+                            emoji_output = emoji_id
                         else:
-                            new_value += line + "\n"
+                            emoji_id = reaction.emoji.id
+                            emoji_output = ":" + reaction.emoji.name + ":"
 
-                    msg["embed"].remove_field(index)
-                    if msg["reactions"]:
-                        msg["embed"].add_field(name="Reactions", inline=False, value=new_value)
+                        msg["reactions"][emoji_id] -= 1
+                        if msg["reactions"][emoji_id] == 0:
+                            del msg["reactions"][emoji_id]
 
-                    for message_sent in msg["messages"]:
-                        try:
-                            await self.bot.edit_message(message_sent, embed=msg["embed"])
-                        except discord.HTTPException:
-                            pass
+                        for i in range(0, len(msg["embed"].fields)):
+                            if msg["embed"].fields[i].name == "Reactions":
+                                index = i
+                                break
+
+                        new_value = ""
+                        for line in msg["embed"].fields[index].value.splitlines():
+                            if line.startswith(emoji_output):
+                                if emoji_id in msg["reactions"]:
+                                    line_index = line.find(" - ")
+                                    new_value += line[:line_index + 3] + \
+                                                    str(int(line[line_index + 3:]) - 1) + "\n"
+                            else:
+                                new_value += line + "\n"
+
+                        msg["embed"].remove_field(index)
+                        if msg["reactions"]:
+                            msg["embed"].add_field(name="Reactions", inline=False, value=new_value)
+
+                        for message_sent in msg["messages"]:
+                            try:
+                                await self.bot.edit_message(message_sent, embed=msg["embed"])
+                            except discord.HTTPException:
+                                pass
 
 
     async def check_reactions_clear(self, message, reactions):
         """Checks for reactions clears"""
         #pylint: disable=unused-argument
-        for com in self.communications:
-            for msg in self.communications[com].messages:
-                if msg["id"] == message.id:
-                    msg["reactions"] = {}
+        #pylint: disable=too-many-nested-blocks
+        if message.author.id not in self.bot.blacklist:
+            for com in self.communications:
+                for msg in self.communications[com].messages:
+                    if msg["id"] == message.id:
+                        msg["reactions"] = {}
 
-                    index = -1
-                    for i in range(0, len(msg["embed"].fields)):
-                        if msg["embed"].fields[i].name == "Reactions":
-                            index = i
-                            break
+                        index = -1
+                        for i in range(0, len(msg["embed"].fields)):
+                            if msg["embed"].fields[i].name == "Reactions":
+                                index = i
+                                break
 
-                    if index != -1:
-                        msg["embed"].remove_field(index)
+                        if index != -1:
+                            msg["embed"].remove_field(index)
 
-                    for message_sent in msg["messages"]:
-                        try:
-                            await self.bot.edit_message(message_sent, embed=msg["embed"])
-                        except discord.HTTPException:
-                            pass
+                        for message_sent in msg["messages"]:
+                            try:
+                                await self.bot.edit_message(message_sent, embed=msg["embed"])
+                            except discord.HTTPException:
+                                pass
 
 
 

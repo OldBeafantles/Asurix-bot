@@ -96,6 +96,16 @@ class AsurixBot(commands.Bot):
                 self.total_commands = json_data["total commands"]
                 self.total_runtime = timedelta(seconds=json_data["total runtime"])
 
+    def load_blacklist(self):
+        """Loads the blacklist"""
+        if not os.path.exists(self.blacklist_file_path):
+            if not os.path.isdir("settings"):
+                os.makedirs("settings")
+
+            utils.save_json(self.blacklist, self.blacklist_file_path)
+        else:
+            self.blacklist = utils.load_json(self.blacklist_file_path)
+
 
     def load_modules(self):
         """Loads the bot modules"""
@@ -145,9 +155,12 @@ class AsurixBot(commands.Bot):
         self.info_file_path = "settings/infos.json"
         self.load_infos()
         self.bot = discord.Client()
-        self.default_modules = ["base", "communications"]
+        self.default_modules = ["base", "admin"]
         self.loaded_modules = []
         self.modules_file_path = "settings/modules.json"
+        self.blacklist_file_path = "settings/blacklist.json"
+        self.blacklist = []
+        self.load_blacklist()
         self.invite_link = ""
         self.modules = []
         self.version = "0.0.1"

@@ -37,11 +37,18 @@ def run_bot():
         print("\n" + str(len(bot.loaded_modules)) + " modules loaded.")
 
     @bot.event
-    async def on_command(self, message):
+    async def on_command(command, ctx):
         """Triggers AFTER a command is called"""
         #pylint: disable=unused-argument
         #pylint: disable=unused-variable
         bot.total_commands += 1
+
+    @bot.event
+    async def on_message(message):
+        #pylint: disable=unused-variable
+        """Triggers when the bot reads a new message"""
+        if message.author.id not in bot.blacklist:
+            await bot.process_commands(message)
 
     try:
         loop.run_until_complete(bot.run(bot.token, reconnect=True))

@@ -482,7 +482,6 @@ class Base:
         embed.set_thumbnail(url=discord.utils.find(lambda x: x.id == self.bot.user.id, \
                                                 ctx.message.server.members).avatar_url)
         delta = datetime.now() - self.bot.created_at
-        print(delta)
         embed.set_footer(text="Created at " + self.bot.created_at.strftime("%d/%m/%Y %H:%M:%S") + " (" + \
                             self.get_timedelta_str(delta) + " ago)")
 
