@@ -168,8 +168,3 @@ class AsurixBot(commands.Bot):
         super().__init__(command_prefix=self.prefix, description=self.description, loop=loop)
 
         CLEAR()
-
-
-    def is_owner(self, userid: str):
-        """Returns true if the id provided is the owner id"""
-        return userid == self.owner_id
