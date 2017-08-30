@@ -65,12 +65,6 @@ CONDITIONS = { \
              }
 
 
-def is_owner_or_server_owner(ctx):
-    """Returns true if the author is the owner of the server or the bot's owner"""
-    return ctx.bot.is_owner(ctx.message.author.id) \
-            or ctx.message.author.id == ctx.message.server.owner.id
-
-
 class Roles:
     """Roles module"""
 
@@ -124,7 +118,7 @@ class Roles:
 
 
     @commands.command()
-    @checks.custom(is_owner_or_server_owner)
+    @checks.is_owner_or_server_owner()
     async def list_roles_conditions(self):
         """Lists all the different conditions that can be used"""
         msg = "```Markdown\nList of the conditions\n======================\n\n"
@@ -138,7 +132,7 @@ class Roles:
 
 
     @commands.command(pass_context=True)
-    @checks.custom(is_owner_or_server_owner)
+    @checks.is_owner_or_server_owner()
     async def add_sa_role(self, ctx, *role_name):
         """Adds a role which could be self assignable
         Parameters:
@@ -177,7 +171,7 @@ class Roles:
 
 
     @commands.command(pass_context=True)
-    @checks.custom(is_owner_or_server_owner)
+    @checks.is_owner_or_server_owner()
     async def list_sa_roles(self, ctx):
         """Lists all the self-assignable roles of the server"""
         if ctx.message.server.id in self.servers_config:
@@ -196,7 +190,7 @@ class Roles:
 
 
     @commands.command(pass_context=True)
-    @checks.custom(is_owner_or_server_owner)
+    @checks.is_owner_or_server_owner()
     async def show_sa_role(self, ctx, *role_name):
         """Shows details about a self-assignable role
         Parameters:
@@ -244,7 +238,7 @@ class Roles:
 
 
     @commands.command(pass_context=True)
-    @checks.custom(is_owner_or_server_owner)
+    @checks.is_owner_or_server_owner()
     async def rem_sa_role(self, ctx, *role_name):
         """Removes a self-assignable role
         Parameters:
@@ -271,7 +265,7 @@ class Roles:
 
 
     @commands.command(pass_context=True)
-    @checks.custom(is_owner_or_server_owner)
+    @checks.is_owner_or_server_owner()
     async def edit_sa_expression(self, ctx, expression_type: str, *role_name):
         """Edits the expression used to check if someone can self-assign a role
         Parameters:
@@ -417,7 +411,7 @@ class Roles:
 
 
     @commands.command(pass_context=True)
-    @checks.custom(is_owner_or_server_owner)
+    @checks.is_owner_or_server_owner()
     async def add_sa_condition(self, ctx, condition_type: str, condition: str, *role_name):
         """Adds a condition for self-assignement/self-removal
         Parameters:
@@ -475,7 +469,7 @@ class Roles:
 
 
     @commands.command(pass_context=True)
-    @checks.custom(is_owner_or_server_owner)
+    @checks.is_owner_or_server_owner()
     async def rem_sa_condition(self, ctx, condition_type: str, *role_name):
         """Removes a condition for self-assignement
         Parameters:

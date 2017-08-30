@@ -42,7 +42,7 @@ The guide for installing the bot is [here](INSTALLING.md)
 * [ ] Kick / Mute / Ban system
 * [ ] Moderation logs system
 
-## Roles module
+### Roles module
 
 * [ ] A more intuitive system
 * [ ] More conditions types
