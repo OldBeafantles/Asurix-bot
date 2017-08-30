@@ -10,6 +10,7 @@ The guide for installing the bot is [here](INSTALLING.md)
 
 * Inter-channels communication
 * Basic bot's configuration
+* Roles self-assignment / self-removal (with very complete configuration)
 
 ## Improvments to do
 
@@ -39,7 +40,13 @@ The guide for installing the bot is [here](INSTALLING.md)
 ### Admin module
 
 * [ ] Kick / Mute / Ban system
-* [ ] Moderations logs system
+* [ ] Moderation logs system
+
+## Roles module
+
+* [ ] A more intuitive system
+* [ ] More conditions types
+* [ ] Notify the user who's changing the bot's permissions if these changes are affecting bot's roles assignements / removals
 
 ### Hungers games modules (not released yet)
 
@@ -63,7 +70,6 @@ The guide for installing the bot is [here](INSTALLING.md)
 
 ## Upcoming features
 
-* Bot's profile customization
 * Moderating commands
 * Hunger games module
 
