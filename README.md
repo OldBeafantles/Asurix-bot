@@ -40,7 +40,7 @@ The guide for installing the bot is [here](INSTALLING.md)
 ### Admin module
 
 * [X] Kick / Ban commands
-* [ ] 
+* [ ] b1nzy_ban command
 * [ ] Mute system
 * [ ] Moderation logs system
 
