@@ -1,7 +1,11 @@
 .vscode
 discord.log
 settings
-data
+data/communications/*
+data/hunger_games/districts.json
+data/hunger_games/players.json
+data/roles/servers.json
+data/admin/servers_config.json
 *.pyc
 VPS_private_key.ppk
 VPS_public_key

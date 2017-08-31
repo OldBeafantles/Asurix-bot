@@ -39,7 +39,9 @@ The guide for installing the bot is [here](INSTALLING.md)
 
 ### Admin module
 
-* [ ] Kick / Mute / Ban system
+* [X] Kick / Ban commands
+* [ ] 
+* [ ] Mute system
 * [ ] Moderation logs system
 
 ### Roles module
