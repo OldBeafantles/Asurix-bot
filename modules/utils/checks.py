@@ -59,7 +59,7 @@ def is_owner_or_has_permissions_check(ctx, permissions):
 def is_owner_or_administrator_check(ctx):
     """Returns true if it's the bot's owner or if the member is an administator"""
     return ctx.message.author.id == ctx.bot.owner_id \
-        or ctx.message.author.server_permissions.administator
+        or ctx.message.author.server_permissions.administrator
 
 
 def is_owner():
@@ -83,6 +83,17 @@ def is_owner_or_has_permissions(permissions):
         """Simple checking function"""
         return is_owner_or_has_permissions_check(ctx, permissions)
     return commands.check(check)
+
+
+def is_owner_or_has_permission(permission):
+    """Returns true if it's the bot's owner or if the member has the permission"""
+    def check(ctx):
+        """Simple checking function"""
+        if permission not in PERMISSIONS:
+            return False
+        return PERMISSIONS[permission](ctx.message.author.server_permissions)
+    return commands.check(check)
+
 
 def custom(function):
     """Custom check"""
