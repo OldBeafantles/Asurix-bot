@@ -756,6 +756,7 @@ class Admin:
             i = 1
             for log in self.servers_config["servers"][ctx.message.server.id]["logs"][member.id]:
                 msg += str(i) + ". " + log.type + "\n"
+                msg += "\tCase#" + str(log.log_id) + "\n"
                 msg += "\tResponsible: " + log.responsible.name + "#" + log.responsible.discriminator + " (" + log.responsible.id + ")\n" #pylint: disable=line-too-long
                 msg += "\tReason: " + log.reason + "\n"
                 msg += "\tDate: " + log.date + "\n\n"
@@ -787,6 +788,7 @@ class Admin:
                 i = 1
                 for log in self.servers_config["servers"][ctx.message.server.id]["logs"][member.id]:
                     msg += str(i) + ". " + log.type + "\n"
+                    msg += "\tCase#" + str(log.log_id) + "\n"
                     msg += "\tResponsible: " + log.responsible.name + "#" + log.responsible.discriminator + " (" + log.responsible.id + ")\n" #pylint: disable=line-too-long
                     msg += "\tReason: " + log.reason + "\n"
                     msg += "\tDate: " + log.date + "\n\n"
