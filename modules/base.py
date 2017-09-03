@@ -497,6 +497,7 @@ class Base:
         embed.add_field(name="Python's version", value=python_version)
         embed.add_field(name="Commit", value=commit)
         embed.add_field(name="Bot's version", value=self.bot.version)
+        embed.add_field(name="Discord's version", value=discord.__version__)
         embed.add_field(name="Environment", value=os_infos)
 
         embed.add_field(name="Total commands typed", value=str(self.bot.total_commands + 1))
@@ -537,6 +538,7 @@ class Base:
         await self.bot.say("Python version: " + python_version + "\n" + \
                            "Commit: " + commit + "\n" + \
                            "Bot's version: " + self.bot.version + "\n" + \
+                           "Discord's version: " + discord.__version__ + "\n" + \
                            "Environment: " + os_infos) 
 
 
