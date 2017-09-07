@@ -5,8 +5,7 @@ data/communications/*
 data/hunger_games/districts.json
 data/hunger_games/players.json
 data/roles/servers.json
-data/admin/servers_config.json
-data/admin/moderators.json
+data/admin/*
 modules/beafantles.py
 *.pyc
 VPS_private_key.ppk
