@@ -41,10 +41,11 @@ The guide for installing the bot is [here](INSTALLING.md)
 
 * [X] Kick / Unban / Ban commands
 * [X] Warn command
-* [ ] b1nzy_ban command
+* [X] b1nzy_ban command
 * [ ] Mute system
 * [X] Moderation logs system
 * [ ] Allows reasons edits
+* [ ] Checks for audit logs and updates
 
 ### Roles module
 
