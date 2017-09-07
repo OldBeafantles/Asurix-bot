@@ -343,7 +343,8 @@ class Communications:
 
                 embed_msg.set_footer(text="In #" + msg.channel.name + " (server: " + \
                                     msg.server.name + ")", icon_url=msg.server.icon_url)
-                embed_msg.set_author(name=msg.author.name + "#" + msg.author.discriminator, \
+                embed_msg.set_author(name=msg.author.name + "#" + msg.author.discriminator + \
+                                    " (" + msg.author.id + ")", \
                                     url=msg.author.avatar_url, icon_url=msg.author.avatar_url)
 
                 if msg.attachments: #length different from 0
