@@ -234,6 +234,7 @@ class Base:
             await self.bot.say(str(e))
         else:
             await self.bot.say('\U0001f44c')
+            print(module + " loaded.")
 
 
     @commands.command()
@@ -250,6 +251,7 @@ class Base:
                 await self.bot.say(str(e))
             else:
                 await self.bot.say('\U0001f44c')
+                print(module + "unloaded.")
         else:
             await self.bot.say("This module isn't even loaded")
 
@@ -271,6 +273,7 @@ class Base:
             await self.bot.say(str(e))
         else:
             await self.bot.say('\U0001f44c')
+            print(module + " reloaded.")
 
     @commands.command()
     @checks.is_owner()
