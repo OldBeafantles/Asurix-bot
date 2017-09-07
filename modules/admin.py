@@ -19,7 +19,8 @@ COLORS = { \
             "Unban": 255 * math.pow(16, 2), \
             "Warning": 250 * math.pow(16, 4) + 219 * math.pow(16, 2) + 24, \
             "Kick": 243 * math.pow(16, 4) + 111 * math.pow(16, 2) + 40, \
-            "Ban": 255 * math.pow(16, 4) \
+            "Ban": 255 * math.pow(16, 4), \
+            "b1nzy ban": 1 \
          }
 
 
@@ -28,13 +29,13 @@ class Log:
 
     id_counter = 1
 
-    def __init__(self, log_type: str, member: discord.Member, \
-                responsible: discord.Member, reason: str, date: str):
+    def __init__(self, log_type: str, member_id: str, \
+                responsible_id: str, reason: str, date: str):
         """Init function"""
         #pylint: disable=too-many-arguments
         self.type = log_type
-        self.user = member
-        self.responsible = responsible
+        self.user_id = member_id
+        self.responsible_id = responsible_id
         self.reason = reason
         self.date = date
         self.log_id = Log.id_counter
@@ -44,24 +45,36 @@ class Log:
         """Returns a dict representing a log element"""
         data = {}
         data["type"] = self.type
-        data["responsible"] = self.responsible.id
+        data["responsible"] = self.responsible_id
         data["reason"] = self.reason
         data["date"] = self.date
         data["id"] = self.log_id
         return data
 
-    def get_embed(self):
+
+    def get_embed(self, bot):
         """Returns an embed corresponding to the log"""
         embed = discord.Embed()
-        embed.title = self.user.name + "#" + self.user.discriminator + " (" + self.user.id + ")"
+        user = discord.utils.find(lambda u: u.id == self.user_id, \
+                                    bot.get_all_members())
+        if user:
+            embed.title = user.name + "#" + user.discriminator + " (" + user.id + ")"
+            embed.set_thumbnail(url=user.avatar_url)
+        else:
+            embed.title = "Unknown member (" + self.user_id + ")"
+        responsible = discord.utils.find(lambda u: u.id == self.responsible_id, \
+                                    bot.get_all_members())
+        if responsible:
+            embed.add_field(name="Responsible", \
+                        value=responsible.name + "#" + responsible.discriminator + \
+                        " (" + responsible.id + ")", inline=False)
+        else:
+            embed.add_field(name="Responsible", \
+                        value="Uknown responsible (" + self.responsible_id + ")", inline=False)
+
         embed.timestamp = datetime.strptime(self.date, "%d/%m/%Y %H:%M:%S")
         embed.colour = discord.Colour(value=COLORS[self.type])
-        embed.set_thumbnail(url=self.user.avatar_url)
         embed.set_author(name="Case #" + str(self.log_id))
-        embed.add_field(name="Responsible", \
-                        value=self.responsible.name + "#" + self.responsible.discriminator + \
-                                " (" + self.responsible.id + ")", \
-                        inline=False)
         embed.add_field(name="Reason", value=self.reason, inline=False)
         return embed
 
@@ -118,8 +131,8 @@ class Admin:
                                 known_admins[log["responsible"]] = responsible
                             else:
                                 responsible = known_admins[log["responsible"]]
-                            logs[user_id].append(Log(log_type=log["type"], member=member, \
-                                            responsible=responsible, reason=log["reason"], \
+                            logs[user_id].append(Log(log_type=log["type"], member_id=member.id, \
+                                            responsible_id=responsible.id, reason=log["reason"], \
                                             date=log["date"]))
                     data["servers"][server]["logs"] = logs
             Log.id_counter = data["id counter"]
@@ -135,12 +148,29 @@ class Admin:
                 data["servers"][server]["log channel"] = data["servers"][server]["log channel"].id
             if "logs" in data["servers"][server]:
                 logs = {}
-                for user in data["servers"][server]["logs"]:
-                    logs[user] = []
-                    for log in data["servers"][server]["logs"][user]:
-                        logs[user].append(log.get_save())
+                for user_id in data["servers"][server]["logs"]:
+                    logs[user_id] = []
+                    for log in data["servers"][server]["logs"][user_id]:
+                        logs[user_id].append(log.get_save())
                 data["servers"][server]["logs"] = logs
         utils.save_json(data, self.servers_config_file_path)
+
+
+    def load_b1nzy_banlist(self):
+        """Loads the b1nzy banlist"""
+        if not os.path.exists(self.b1nzy_banlist_path):
+
+            if not os.path.isdir("data/admin"):
+                os.makedirs("data/admin")
+
+            utils.save_json(self.b1nzy_banlist, self.b1nzy_banlist_path)
+        else:
+            self.b1nzy_banlist = utils.load_json(self.b1nzy_banlist_path)
+
+
+    def save_b1nzy_banlist(self):
+        """Saves the b1nzy banlist"""
+        utils.save_json(self.b1nzy_banlist, self.b1nzy_banlist_path)
 
 
     def __init__(self, bot):
@@ -152,13 +182,16 @@ class Admin:
         self.moderators = {}
         self.moderators_file_path = "data/admin/moderators.json"
         self.load_moderators()
+        self.b1nzy_banlist = {}
+        self.b1nzy_banlist_path = "data/admin/b1nzy_banlist.json"
+        self.load_b1nzy_banlist()
 
 
     async def send_log(self, server: discord.Server, log: Log):
         """Sends a embed corresponding to the log in the log channel of the server"""
         if server.id in self.servers_config["servers"]:
             if "log channel" in self.servers_config["servers"][server.id]:
-                embed = log.get_embed()
+                embed = log.get_embed(self.bot)
                 channel = self.servers_config["servers"][server.id]["log channel"]
                 try:
                     await self.bot.send_message(destination=channel, embed=embed)
@@ -447,8 +480,8 @@ class Admin:
         Example: [p]warn @BagGuy Rude words.
                  [p]warn @AnotherBadGuy"""
         reason = " ".join(reason)
-        log = Log(log_type="Warning", member=member, \
-                responsible=ctx.message.author, reason=reason, \
+        log = Log(log_type="Warning", member_id=member.id, \
+                responsible_id=ctx.message.author.id, reason=reason, \
                 date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
         if ctx.message.server.id not in self.servers_config["servers"]:
             self.servers_config["servers"][ctx.message.server.id] = {}
@@ -476,8 +509,8 @@ class Admin:
                                 ctx.message.server.members)
         if member:
             reason = " ".join(reason)
-            log = Log(log_type="Warning", member=member, \
-                    responsible=ctx.message.author, reason=reason, \
+            log = Log(log_type="Warning", member_id=member.id, \
+                    responsible_id=ctx.message.author.id, reason=reason, \
                     date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
             if not ctx.message.server.id in self.servers_config["servers"]:
                 self.servers_config["servers"][ctx.message.server.id] = {}
@@ -507,7 +540,7 @@ class Admin:
         try:
             await self.bot.kick(member)
             reason = " ".join(reason)
-            log = Log(log_type="Kick", member=member, responsible=ctx.message.author, \
+            log = Log(log_type="Kick", member_id=member.id, responsible_id=ctx.message.author.id, \
                     reason=reason, date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
             if not ctx.message.server.id in self.servers_config["servers"]:
                 self.servers_config["servers"][ctx.message.server.id] = {}
@@ -541,7 +574,8 @@ class Admin:
             if member:
                 await self.bot.kick(member)
                 reason = " ".join(reason)
-                log = Log(log_type="Kick", member=member, responsible=ctx.message.author, \
+                log = Log(log_type="Kick", member_id=member.id, \
+                        responsible_id=ctx.message.author.id, \
                         reason=reason, date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
                 if not ctx.message.server.id in self.servers_config["servers"]:
                     self.servers_config["servers"][ctx.message.server.id] = {}
@@ -586,7 +620,8 @@ class Admin:
             try:
                 await self.bot.ban(member, days)
                 reason = to_add + " ".join(reason)
-                log = Log(log_type="Ban", member=member, responsible=ctx.message.author, \
+                log = Log(log_type="Ban", member_id=member.id, \
+                        responsible_id=ctx.message.author.id, \
                         reason=reason, date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
                 if not ctx.message.server.id in self.servers_config["servers"]:
                     self.servers_config["servers"][ctx.message.server.id] = {}
@@ -635,7 +670,8 @@ class Admin:
                 try:
                     await self.bot.ban(member, days)
                     reason = to_add + " ".join(reason)
-                    log = Log(log_type="Ban", member=member, responsible=ctx.message.author, \
+                    log = Log(log_type="Ban", member_id=member.id, \
+                            responsible_id=ctx.message.author.id, \
                             reason=reason, date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
                     if not ctx.message.server.id in self.servers_config["servers"]:
                         self.servers_config["servers"][ctx.message.server.id] = {}
@@ -660,6 +696,56 @@ class Admin:
 
     @commands.command(pass_context=True)
     @checks.custom(is_owner_or_moderator)
+    async def b1nzy_ban(self, ctx, member_id: str, *reason):
+        """Bans a member even if he's not on the server, using his ID
+        Parameters:
+            member_id: The ID of the member you want to ban.
+            *reason: The reason of the ban.
+
+        Example: [p]b1nzy_ban 346654353341546499 Bad guy.
+                 [p]b1nzy_ban 346654353341546499
+
+        Note: How does it works?
+                If the member left the server to avoid the ban hammer, you
+                can still use this command on him. He actually wouldn't be
+                banned but as soon as he would come to the server again, he
+                would be instantanely banned"""
+        member = discord.utils.find(lambda m: m.id == member_id, \
+                                    ctx.message.server.members)
+        reason = " ".join(reason)
+        if member:
+            try:
+                await self.bot.ban(member)
+            except discord.Forbidden:
+                await self.bot.say("I'm not allowed to do that.\n" + \
+                                    "(Missing permissions)")
+        else:
+            if not ctx.message.server.id in self.b1nzy_banlist:
+                self.b1nzy_banlist[ctx.message.server.id] = []
+            if not member_id in self.b1nzy_banlist[ctx.message.server.id]:
+                self.b1nzy_banlist[ctx.message.server.id].append(member_id)
+                self.save_b1nzy_banlist()
+            else:
+                await self.bot.say("This user was already in the b1nzy banlist.")
+                return
+
+        log = Log(log_type="b1nzy ban", member_id=member_id, responsible_id=ctx.message.author.id, \
+                        reason=reason, date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
+        if not ctx.message.server.id in self.servers_config["servers"]:
+            self.servers_config["servers"][ctx.message.server.id] = {}
+        if not "logs" in self.servers_config["servers"][ctx.message.server.id]:
+            self.servers_config["servers"][ctx.message.server.id]["logs"] = {}
+        if member_id in self.servers_config["servers"][ctx.message.server.id]["logs"]:
+            self.servers_config["servers"][ctx.message.server.id]["logs"][member_id].append(log) #pylint: disable=line-too-long
+        else:
+            self.servers_config["servers"][ctx.message.server.id]["logs"][member_id] = [log] #pylint: disable=line-too-long
+        self.save_servers_config()
+        await self.send_log(server=ctx.message.server, log=log)
+        await self.bot.say("Done.")
+
+
+    @commands.command(pass_context=True)
+    @checks.custom(is_owner_or_moderator)
     async def unban(self, ctx, member: str, *reason):
         """Unbans a member
         Parameters:
@@ -681,7 +767,8 @@ class Admin:
                 if member:
                     await self.bot.unban(ctx.message.server, member)
                     reason = " ".join(reason)
-                    log = Log(log_type="Unban", member=member, responsible=ctx.message.author, \
+                    log = Log(log_type="Unban", member_id=member.id, \
+                            responsible_id=ctx.message.author.id, \
                             reason=reason, date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
                     if not ctx.message.server.id in self.servers_config["servers"]:
                         self.servers_config["servers"][ctx.message.server.id] = {}
@@ -719,7 +806,8 @@ class Admin:
             if member:
                 await self.bot.unban(ctx.message.server, member)
                 reason = " ".join(reason)
-                log = Log(log_type="Unban", member=member, responsible=ctx.message.author, \
+                log = Log(log_type="Unban", member_id=member.id, \
+                        responsible_id=ctx.message.author.id, \
                         reason=reason, date=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
                 if not ctx.message.server.id in self.servers_config["servers"]:
                     self.servers_config["servers"][ctx.message.server.id] = {}
@@ -778,7 +866,7 @@ class Admin:
         Example: [p]list_logs_id 151661401411289088"""
 
         member = discord.utils.find(lambda m: m.id == member_id, \
-                                ctx.message.server.members)
+                                    self.bot.get_all_members())
         if member:
             if ctx.message.server.id in self.servers_config \
                     and "logs" in self.servers_config["servers"][ctx.message.server.id] \
@@ -802,6 +890,26 @@ class Admin:
             await self.bot.say("There's no member with such ID on this server.")
 
 
+    async def check_new_comers(self, member):
+        """Checks if a new comer is in the b1nzy banlist"""
+        if member.server.id in self.b1nzy_banlist:
+            if member.id in self.b1nzy_banlist[member.server.id]:
+                try:
+                    await self.bot.ban(member)
+                    self.b1nzy_banlist[member.server.id].remove(member.id)
+                    if not self.b1nzy_banlist[member.server.id]:
+                        del self.b1nzy_banlist[member.server.id]
+                    self.save_b1nzy_banlist()
+                except discord.Forbidden:
+                    await self.bot.send_message(member.server.owner, \
+                        "Couldn't ban " + member.name + "#" + member.discriminator + \
+                        " (" + member.id + ") who's in the b1nzy banlist --> missing permissions")
+                except discord.HTTPException:
+                    pass
+
+
 def setup(bot):
     """Setup function"""
-    bot.add_cog(Admin(bot))
+    mod = Admin(bot)
+    bot.add_listener(mod.check_new_comers, "on_member_join")
+    bot.add_cog(mod)
