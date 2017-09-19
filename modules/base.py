@@ -43,30 +43,7 @@ class Base:
         if e.text is None:
             return f'```py\n{e.__class__.__name__}: {e}\n```'
         return f'```py\n{e.text}{"^":>{e.offset}}\n{e.__class__.__name__}: {e}```'
-
-
-    def get_timedelta_str(self, delta: timedelta):
-        msg = ""
-        s = int(delta.total_seconds())
-        years = s // 3153600
-        if years != 0:
-            msg += str(years) + "y "
-        s -= years * 3153600
-        days = s // 86400
-        if days != 0:
-            msg += str(days) + "d "
-        s -= days * 86400
-        hours = s // 3600
-        if hours != 0:
-            msg += str(hours) + "h "
-        s -= hours * 3600
-        minutes = s // 60
-        s -= minutes * 60
-        if minutes != 0:
-            msg += str(minutes) + "m "
-        if s != 0:
-            msg += str(s) + "s "
-        return msg[:-1]
+    
 
     def save_infos(self):
         json_data = {}
@@ -486,7 +463,7 @@ class Base:
                                                 ctx.message.server.members).avatar_url)
         delta = datetime.now() - self.bot.created_at
         embed.set_footer(text="Created at " + self.bot.created_at.strftime("%d/%m/%Y %H:%M:%S") + " (" + \
-                            self.get_timedelta_str(delta) + " ago)")
+                            utils.convert_seconds_to_str(delta.total_seconds()) + " ago)")
 
 
         python_version = str(subprocess.check_output("python --version", shell=True))[2:-5]
@@ -505,11 +482,11 @@ class Base:
 
         embed.add_field(name="Total commands typed", value=str(self.bot.total_commands + 1))
         delta = (datetime.now() - self.bot.launched_at) + self.bot.total_runtime
-        msg = self.get_timedelta_str(delta)
+        msg = utils.convert_seconds_to_str(delta.total_seconds())
         if msg != "":
             embed.add_field(name="Total run time", value=msg)
         delta = datetime.now() - self.bot.launched_at
-        msg = self.get_timedelta_str(delta)
+        msg = utils.convert_seconds_to_str(delta.total_seconds())
         if msg != "":
             embed.add_field(name="Run time", value=msg)
         embed.add_field(name="Servers", value=str(len(self.bot.servers)))

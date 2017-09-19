@@ -86,18 +86,18 @@ class Admin:
 
     def load_moderators(self):
         """Loads the moderators"""
-        if not os.path.exists(self.moderators_file_path):
+        if not os.path.exists(self.bot.moderators_file_path):
 
             if not os.path.isdir("data/admin"):
                 os.makedirs("data/admin")
 
-            utils.save_json(self.moderators, self.moderators_file_path)
+            utils.save_json(self.bot.moderators, self.bot.moderators_file_path)
         else:
-            self.moderators = utils.load_json(self.moderators_file_path)
+            self.bot.moderators = utils.load_json(self.bot.moderators_file_path)
 
     def save_moderators(self):
         """Saves the moderators"""
-        utils.save_json(self.moderators, self.moderators_file_path)
+        utils.save_json(self.bot.moderators, self.bot.moderators_file_path)
 
 
     def load_servers_config(self):
@@ -180,8 +180,8 @@ class Admin:
         self.servers_config = {}
         self.servers_config_file_path = "data/admin/servers_config.json"
         self.load_servers_config()
-        self.moderators = {}
-        self.moderators_file_path = "data/admin/moderators.json"
+        self.bot.moderators = {}
+        self.bot.moderators_file_path = "data/admin/moderators.json"
         self.load_moderators()
         self.b1nzy_banlist = {}
         self.b1nzy_banlist_path = "data/admin/b1nzy_banlist.json"
@@ -283,11 +283,11 @@ class Admin:
             member: The member that will become a moderator.
 
         Example: [p]add_moderator @Beafantles"""
-        if ctx.message.server.id not in self.moderators:
-            self.moderators[ctx.message.server.id] = [member.id]
+        if ctx.message.server.id not in self.bot.moderators:
+            self.bot.moderators[ctx.message.server.id] = [member.id]
         else:
-            if member.id not in self.moderators[ctx.message.server.id]:
-                self.moderators[ctx.message.server.id].append(member.id)
+            if member.id not in self.bot.moderators[ctx.message.server.id]:
+                self.bot.moderators[ctx.message.server.id].append(member.id)
             else:
                 await self.bot.say(member.name + "#" + member.discriminator + \
                         " is already a moderator on this server.")
@@ -307,11 +307,11 @@ class Admin:
         member = discord.utils.find(lambda m: m.id == member_id, \
                                     ctx.message.server.members)
         if member:
-            if ctx.message.server.id not in self.moderators:
-                self.moderators[ctx.message.server.id] = [member.id]
+            if ctx.message.server.id not in self.bot.moderators:
+                self.bot.moderators[ctx.message.server.id] = [member.id]
             else:
-                if member.id not in self.moderators[ctx.message.server.id]:
-                    self.moderators[ctx.message.server.id].append(member.id)
+                if member.id not in self.bot.moderators[ctx.message.server.id]:
+                    self.bot.moderators[ctx.message.server.id].append(member.id)
                 else:
                     await self.bot.say(member.name + "#" + member.discriminator + \
                             " is already a moderator on this server.")
@@ -330,11 +330,11 @@ class Admin:
             moderator: The moderator you want to revoke.
 
         Example: [p]rem_moderator @Kazutsuki"""
-        if ctx.message.server.id in self.moderators:
-            if moderator.id in self.moderators[ctx.message.server.id]:
-                self.moderators[ctx.message.server.id].remove(moderator.id)
-                if not self.moderators[ctx.message.server.id]:
-                    del self.moderators[ctx.message.server.id]
+        if ctx.message.server.id in self.bot.moderators:
+            if moderator.id in self.bot.moderators[ctx.message.server.id]:
+                self.bot.moderators[ctx.message.server.id].remove(moderator.id)
+                if not self.bot.moderators[ctx.message.server.id]:
+                    del self.bot.moderators[ctx.message.server.id]
                 self.save_moderators()
                 await self.bot.say("Done.")
             else:
@@ -355,11 +355,11 @@ class Admin:
         moderator = discord.utils.find(lambda m: m.id == moderator_id, \
                     ctx.message.server.members)
         if moderator:
-            if ctx.message.server.id in self.moderators:
-                if moderator.id in self.moderators[ctx.message.server.id]:
-                    self.moderators[ctx.message.server.id].remove(moderator.id)
-                    if not self.moderators[ctx.message.server.id]:
-                        del self.moderators[ctx.message.server.id]
+            if ctx.message.server.id in self.bot.moderators:
+                if moderator.id in self.bot.moderators[ctx.message.server.id]:
+                    self.bot.moderators[ctx.message.server.id].remove(moderator.id)
+                    if not self.bot.moderators[ctx.message.server.id]:
+                        del self.bot.moderators[ctx.message.server.id]
                     self.save_moderators()
                     await self.bot.say("Done.")
                 else:
@@ -375,11 +375,11 @@ class Admin:
     @checks.is_owner_or_server_owner()
     async def list_moderators(self, ctx):
         """Lists all the moderators on this server"""
-        if ctx.message.server.id in self.moderators:
+        if ctx.message.server.id in self.bot.moderators:
             msg = "```Markdown\nModerators on this server\n========================\n\n"
             has_unknown = False
             i = 1
-            for mod_id in self.moderators[ctx.message.server.id]:
+            for mod_id in self.bot.moderators[ctx.message.server.id]:
                 msg += str(i) + ". "
                 moderator = discord.utils.find(lambda m, mod=mod_id: m.id == mod, \
                             ctx.message.server.members)
