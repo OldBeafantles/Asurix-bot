@@ -4,3 +4,9 @@ pip install asyncio
 pip install requests
 pip install datetime
 pip install pytimeparse
+pip install psutil
+pip install google-api-python-client
+pip install tzlocal
+pip install pynacl
+pip install mutagen
+pip install youtube_dl
