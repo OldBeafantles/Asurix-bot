@@ -223,7 +223,7 @@ class Communications:
                         msg += ":white_check_mark:"
 
                 else:
-                    msg += "`UNKNOWN CHANNEL`"
+                    msg += "`UNKNOWN CHANNEL` (" + com.id + ") :x:"
 
                 msg += "\n"
                 i += 1
