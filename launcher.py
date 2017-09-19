@@ -3,7 +3,7 @@
 import os
 import subprocess
 import sys
-from run import run_bot
+import shutil
 
 
 # USEFUL FUNCTIONS
@@ -26,6 +26,33 @@ def install_update():
     # Update the requirements
     for req in requirements:
         os.system(req)
+
+    if not os.path.exists("ffmpeg.exe"):
+        if sys.platform == "win32":
+            print("Downloading ffmpeg...")
+            import requests
+            req = requests.get("http://ffmpeg.zeranoe.com/builds/win32/static/ffmpeg-20170915-6743351-win32-static.zip") #pylint: disable=line-too-long
+            path = "ffmpeg-20170915-6743351-win32-static/bin"
+        elif sys.platform == "win64":
+            print("Downloading ffmpeg...")
+            import requests
+            req = requests.get("http://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20170915-6743351-win64-static.zip") #pylint: disable=line-too-long
+            path = "ffmpeg-20170915-6743351-win64-static/bin"
+        else:
+            os.system("sudo apt-get install libav-tools -y")
+            return
+        print("Copying ffmpeg on the repository...")
+        with open("ffmpeg.zip", "wb") as code:
+            code.write(req.content)
+            print("Extracting ffmpeg...")
+            import zipfile
+            file = zipfile.ZipFile("ffmpeg.zip", "r")
+            file.extract(member="ffmpeg-20170915-6743351-win32-static/bin/ffmpeg.exe")
+            os.rename("ffmpeg-20170915-6743351-win32-static/bin/ffmpeg.exe", "ffmpeg.exe")
+            file.close()
+        print("Cleaning the directory...")
+        os.remove("ffmpeg.zip")
+        shutil.rmtree(path.split("/")[0])
 
 
 # LAUNCHING THE BOT
@@ -50,4 +77,5 @@ while ANSWER != "3":
     if ANSWER == "1":
         install_update()
     elif ANSWER == "2":
+        from run import run_bot
         run_bot()
