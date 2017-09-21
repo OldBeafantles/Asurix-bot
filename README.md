@@ -69,6 +69,7 @@ The guide for installing the bot is [here](INSTALLING.md)
   * [X] Bug#4 - Can't detect if the git repo is outdated
   * [X] Bug#5 - Clear function doesn't work on non-Windows OS
   * [X] Bug#7 - Can't load remaining modules at bot's start if one of them was wrong
+  * [X] Bug#10 - Launcher couldn't run without discord library installed
 * Base
   * [X] Bug#8 - `info` isn't triggered
   * [X] Bug#9 - `info` wasn't showing correct info about the runtimes + time since bot's creation
