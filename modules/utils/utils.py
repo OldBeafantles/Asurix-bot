@@ -13,9 +13,10 @@ def save_json(data: json, filename: str, should_be_sorted=True):
         json.dump(data, file, indent=4, sort_keys=should_be_sorted, separators=(',', ': '))
 
 
-def convert_seconds_to_str(sec: int):
+def convert_seconds_to_str(sec: float):
     """Returns a str representing a number of seconds"""
     msg = ""
+    sec = round(sec)
     years = sec // 31536000
     if years != 0:
         msg += str(int(years)) + "y "
