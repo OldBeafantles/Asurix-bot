@@ -13,8 +13,8 @@ def is_owner_or_moderator(ctx):
     """Returns true if the author is the bot's owner or a moderator on the server"""
     return ctx.message.author.id == ctx.bot.owner_id \
         or ctx.message.author.id == ctx.message.server.owner.id \
-        or (ctx.message.server.id in ctx.bot.cogs["Admin"].moderators \
-            and ctx.message.author.id in ctx.bot.cogs["Admin"].moderators[ctx.message.server.id])
+        or (ctx.message.server.id in ctx.bot.moderators \
+            and ctx.message.author.id in ctx.bot.moderators[ctx.message.server.id])
 
 COLORS = { \
             "Unban": 255 * math.pow(16, 2), \
