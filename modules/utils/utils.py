@@ -1,5 +1,6 @@
 """Utilities functions file"""
 import json
+import re
 
 def load_json(filename: str):
     """Loads a json file"""
@@ -36,6 +37,29 @@ def convert_seconds_to_str(sec: float):
     if sec != 0:
         msg += str(int(sec)) + "s "
     return msg[:-1]
+
+
+SECONDS_VALUES = [31536000, 86400, 3600, 60, 1]
+
+def convert_str_to_seconds(duration: str):
+    """Converts a duration (format %Yy %dd %Hh %Mm %Ss) to the total
+       number of corresponding seconds.
+
+       If the format of duration isn't correct, returns -1."""
+    regex = re.compile("(?=.*[ydhms])( *[0-9]+y *)?( *[0-9]+d *)?( *[0-9]+h *)?( *[0-9]+m *)?( *[0-9]+s *)?") #pylint: disable=line-too-long
+
+    if not regex.fullmatch(duration):
+        return -1
+
+    total_seconds = 0
+    matches = regex.findall(duration)
+    for i in range(5):
+        match = matches[0][i]
+        if match != "":
+            end_of_match = match.find(" ") - 1 if match.find(" ") != -1 else len(match) - 1
+            value = int(match[:end_of_match])
+            total_seconds += SECONDS_VALUES[i] * value
+    return total_seconds
 
 
 def convert_int_to_str(number: int, char: str = "'"):
