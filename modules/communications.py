@@ -153,7 +153,7 @@ class Communications:
 
         else:
             await self.bot.say("A conversation with this name already exists!" \
-                    + "Please choose another name, or edit the existing conversation!")
+                    + " Please choose another name, or edit the existing conversation!")
 
 
     @commands.command()
