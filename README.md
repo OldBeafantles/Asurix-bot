@@ -64,6 +64,7 @@ The guide for installing the bot is [here](INSTALLING.md)
   * [X] Bug#1 - Cannot send messages with only attachments/embeds
   * [X] Bug#2 - Embed's color isn't always correct
   * [X] Bug#6 - Tuple format instead of list when adding a new communication
+  * [X] Bug#11 - `get_conv_details` wasn't sending an answer
 * General
   * [X] Bug#3 - Infinite loop when the bot can't log in
   * [X] Bug#4 - Can't detect if the git repo is outdated

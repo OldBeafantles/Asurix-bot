@@ -197,6 +197,8 @@ class Communications:
             conv_name: The name of the conversation you want the details.
 
         Example: [p]get_conv_details myFirstConv"""
+        #pylint: disable=too-many-branches
+
         if conv_name in self.communications:
             msg = "Details for `" + conv_name + "`:\n\nChannels:\n---------------\n\n"
             i = 1
@@ -223,12 +225,23 @@ class Communications:
                         msg += ":white_check_mark:"
 
                 else:
-                    msg += "`UNKNOWN CHANNEL` (" + com.id + ") :x:"
+                    msg += "`UNKNOWN CHANNEL` (" + com + ") :x:"
 
                 msg += "\n"
                 i += 1
-
-            await self.bot.say(msg)
+            msgs = msg.split("\n")
+            final_msgs = [[msgs[0] + "\n", len(msgs[0])]]
+            tracker = 0
+            for cut_msg in msgs:
+                msg_length = len(cut_msg)
+                if msg_length + final_msgs[tracker][1] <= 1997:
+                    final_msgs[tracker][0] += cut_msg + "\n"
+                    final_msgs[tracker][1] += msg_length + 2
+                else:
+                    final_msgs.append([cut_msg + "\n", len(cut_msg)])
+                    tracker += 1
+            for msg_to_send in final_msgs:
+                await self.bot.say(msg_to_send[0])
         else:
             await self.bot.say("There's no conversation with such name. " \
                     + "To get the list of the conversation, type `[p]list_conv`.")
