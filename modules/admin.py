@@ -132,9 +132,11 @@ class Admin:
                                 known_admins[log["responsible"]] = responsible
                             else:
                                 responsible = known_admins[log["responsible"]]
-                            logs[user_id].append(Log(log_type=log["type"], member_id=member.id, \
-                                            responsible_id=responsible.id, reason=log["reason"], \
-                                            date=log["date"]))
+                            logs[user_id].append(Log(log_type=log["type"],
+                                                     member_id=member.id if member else "UNKNOWN",
+                                                     responsible_id=responsible.id,
+                                                     reason=log["reason"],
+                                                     date=log["date"]))
                     data["servers"][server]["logs"] = logs
             Log.id_counter = data["id counter"]
             self.servers_config = data

@@ -60,6 +60,8 @@ The guide for installing the bot is [here](INSTALLING.md)
 
 ## Bugs
 
+* Admin
+  * [X] Bug#12 - Couldn't load a Log object for an unknown member
 * Inter-channels communication
   * [X] Bug#1 - Cannot send messages with only attachments/embeds
   * [X] Bug#2 - Embed's color isn't always correct
